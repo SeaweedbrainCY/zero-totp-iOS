@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		906D59132BE07E3B00629171 /* api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 906D59122BE07E3B00629171 /* api.swift */; };
 		90DE5C362A950ED40030734B /* Zero_TOTPApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90DE5C352A950ED40030734B /* Zero_TOTPApp.swift */; };
 		90DE5C382A950ED40030734B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90DE5C372A950ED40030734B /* ContentView.swift */; };
 		90DE5C3A2A950ED60030734B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 90DE5C392A950ED60030734B /* Assets.xcassets */; };
@@ -34,6 +35,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		906D59122BE07E3B00629171 /* api.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = api.swift; sourceTree = "<group>"; };
 		90DE5C322A950ED40030734B /* Zero-TOTP.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Zero-TOTP.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		90DE5C352A950ED40030734B /* Zero_TOTPApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zero_TOTPApp.swift; sourceTree = "<group>"; };
 		90DE5C372A950ED40030734B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -71,6 +73,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		906D59112BE07E1F00629171 /* API */ = {
+			isa = PBXGroup;
+			children = (
+				906D59122BE07E3B00629171 /* api.swift */,
+			);
+			path = API;
+			sourceTree = "<group>";
+		};
 		90DE5C292A950ED40030734B = {
 			isa = PBXGroup;
 			children = (
@@ -94,6 +104,7 @@
 		90DE5C342A950ED40030734B /* Zero-TOTP */ = {
 			isa = PBXGroup;
 			children = (
+				906D59112BE07E1F00629171 /* API */,
 				90DE5C352A950ED40030734B /* Zero_TOTPApp.swift */,
 				90DE5C372A950ED40030734B /* ContentView.swift */,
 				90DE5C392A950ED60030734B /* Assets.xcassets */,
@@ -258,6 +269,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				90DE5C382A950ED40030734B /* ContentView.swift in Sources */,
+				906D59132BE07E3B00629171 /* api.swift in Sources */,
 				90DE5C362A950ED40030734B /* Zero_TOTPApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
