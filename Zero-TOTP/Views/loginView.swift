@@ -1,17 +1,8 @@
 //
-//  Zero_TOTPApp.swift
+//  loginView.swift
 //  Zero-TOTP
 //
-//  Created by Stchepinsky Nathan on 22/08/2023.
+//  Created by Stchepinsky Nathan on 16/05/2024.
 //
 
-import SwiftUI
-
-@main
-struct Zero_TOTPApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-    }
-}
+import Foundation
