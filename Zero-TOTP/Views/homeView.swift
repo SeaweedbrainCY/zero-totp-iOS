@@ -10,37 +10,34 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        ZStack {
-            Color("dark").ignoresSafeArea()
-            
-            VStack {
-                /*Spacer()*/
-                Image("logo_zero_totp_light")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
-                    .padding(.top, 30)
-                    .padding(.horizontal, 40)
+        NavigationStack {
+            ZStack {
+                Color("dark").ignoresSafeArea()
                 
-               Spacer()
-            
-                    Button(action: {
-                        // Action du premier bouton
-                    }) {
-                        Text("Login")
-                            .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
-                            .fontWeight(.bold)
-                            .padding()
-                            .foregroundColor(Color("dark"))
-                            .background(Color.white)
-                            .cornerRadius(10)
+                VStack {
+                    /*Spacer()*/
+                    Image("logo_zero_totp_light")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
+                        .padding(.top, 30)
+                        .padding(.horizontal, 40)
+                    
+                    Spacer()
+                    
+                    
+                    NavigationLink("Login"){
+                        LoginView()
                     }
+                    .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
+                    .fontWeight(.bold)
+                    .padding()
+                    .foregroundColor(Color("dark"))
+                    .background(Color.white)
+                    .cornerRadius(10)
                     .padding(.horizontal, 20)
                     
-                    Button(action: {
-                        // Action du deuxième bouton
-                    }) {
-                        Text("Signup")
+                    Link("Signup", destination: URL(string: "https://zero-totp.com/signup")!)
                             .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
                             .fontWeight(.bold)
                             .padding()
@@ -49,22 +46,18 @@ struct ContentView: View {
                             .overlay(
                                 RoundedRectangle(cornerRadius: 10).stroke( Color.white, lineWidth: 1)
                             )
-                    }
                     .padding(.horizontal, 20)
                     .padding(.top, 20)
-                
-                Spacer()
-                Button(action: {
-                    // Action du premier bouton
-                }) {
-                    Text("Privacy Policy")
-                        .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
-                        .padding()
-                        .foregroundColor(Color.gray)
+                    
+                    Spacer()
+                    Link("Privacy Policy", destination: URL(string: "https://zero-totp.com/privacy")!)
+                            .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
+                            .padding()
+                            .foregroundColor(Color.gray)
+                    .padding(.horizontal, 20)
                 }
-                .padding(.horizontal, 20)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 }

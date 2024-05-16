@@ -8,13 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		906D59132BE07E3B00629171 /* api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 906D59122BE07E3B00629171 /* api.swift */; };
-		90DE5C362A950ED40030734B /* Zero_TOTPApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90DE5C352A950ED40030734B /* Zero_TOTPApp.swift */; };
-		90DE5C382A950ED40030734B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90DE5C372A950ED40030734B /* ContentView.swift */; };
+		907886D12BF30F510039E30E /* Zero_TOTP_App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 907886D02BF30F510039E30E /* Zero_TOTP_App.swift */; };
+		90DE5C362A950ED40030734B /* homeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90DE5C352A950ED40030734B /* homeView.swift */; };
 		90DE5C3A2A950ED60030734B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 90DE5C392A950ED60030734B /* Assets.xcassets */; };
 		90DE5C3D2A950ED60030734B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 90DE5C3C2A950ED60030734B /* Preview Assets.xcassets */; };
 		90DE5C472A950ED70030734B /* Zero_TOTPTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90DE5C462A950ED70030734B /* Zero_TOTPTests.swift */; };
 		90DE5C512A950ED70030734B /* Zero_TOTPUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90DE5C502A950ED70030734B /* Zero_TOTPUITests.swift */; };
 		90DE5C532A950ED70030734B /* Zero_TOTPUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90DE5C522A950ED70030734B /* Zero_TOTPUITestsLaunchTests.swift */; };
+		90E2C3912BF6AF7B002C008E /* loginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90E2C3902BF6AF7B002C008E /* loginView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,9 +37,9 @@
 
 /* Begin PBXFileReference section */
 		906D59122BE07E3B00629171 /* api.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = api.swift; sourceTree = "<group>"; };
+		907886D02BF30F510039E30E /* Zero_TOTP_App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zero_TOTP_App.swift; sourceTree = "<group>"; };
 		90DE5C322A950ED40030734B /* Zero-TOTP.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Zero-TOTP.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		90DE5C352A950ED40030734B /* Zero_TOTPApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zero_TOTPApp.swift; sourceTree = "<group>"; };
-		90DE5C372A950ED40030734B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		90DE5C352A950ED40030734B /* homeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = homeView.swift; sourceTree = "<group>"; };
 		90DE5C392A950ED60030734B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		90DE5C3C2A950ED60030734B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		90DE5C422A950ED70030734B /* Zero-TOTPTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Zero-TOTPTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -46,6 +47,7 @@
 		90DE5C4C2A950ED70030734B /* Zero-TOTPUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Zero-TOTPUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		90DE5C502A950ED70030734B /* Zero_TOTPUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zero_TOTPUITests.swift; sourceTree = "<group>"; };
 		90DE5C522A950ED70030734B /* Zero_TOTPUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zero_TOTPUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		90E2C3902BF6AF7B002C008E /* loginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = loginView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,11 +106,11 @@
 		90DE5C342A950ED40030734B /* Zero-TOTP */ = {
 			isa = PBXGroup;
 			children = (
+				90FA5F572BF2F75D0070BA8F /* Views */,
 				906D59112BE07E1F00629171 /* API */,
-				90DE5C352A950ED40030734B /* Zero_TOTPApp.swift */,
-				90DE5C372A950ED40030734B /* ContentView.swift */,
 				90DE5C392A950ED60030734B /* Assets.xcassets */,
 				90DE5C3B2A950ED60030734B /* Preview Content */,
+				907886D02BF30F510039E30E /* Zero_TOTP_App.swift */,
 			);
 			path = "Zero-TOTP";
 			sourceTree = "<group>";
@@ -136,6 +138,15 @@
 				90DE5C522A950ED70030734B /* Zero_TOTPUITestsLaunchTests.swift */,
 			);
 			path = "Zero-TOTPUITests";
+			sourceTree = "<group>";
+		};
+		90FA5F572BF2F75D0070BA8F /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				90DE5C352A950ED40030734B /* homeView.swift */,
+				90E2C3902BF6AF7B002C008E /* loginView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -268,9 +279,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				90DE5C382A950ED40030734B /* ContentView.swift in Sources */,
 				906D59132BE07E3B00629171 /* api.swift in Sources */,
-				90DE5C362A950ED40030734B /* Zero_TOTPApp.swift in Sources */,
+				90DE5C362A950ED40030734B /* homeView.swift in Sources */,
+				90E2C3912BF6AF7B002C008E /* loginView.swift in Sources */,
+				907886D12BF30F510039E30E /* Zero_TOTP_App.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
