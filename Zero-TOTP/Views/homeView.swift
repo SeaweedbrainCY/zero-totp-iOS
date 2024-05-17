@@ -26,18 +26,22 @@ struct ContentView: View {
                     Spacer()
                     
                     
-                    NavigationLink("Login"){
+                    NavigationLink{
                         LoginView()
+                    } label:{
+                        Text("Login")
+                            .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
+                            .fontWeight(.bold)
+                            .padding()
+                            .foregroundColor(Color("dark"))
+                            .background(Color.white)
+                            .cornerRadius(10)
+                            .padding(.horizontal, 20)
                     }
-                    .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
-                    .fontWeight(.bold)
-                    .padding()
-                    .foregroundColor(Color("dark"))
-                    .background(Color.white)
-                    .cornerRadius(10)
-                    .padding(.horizontal, 20)
                     
-                    Link("Signup", destination: URL(string: "https://zero-totp.com/signup")!)
+                    Link(destination: URL(string: "https://zero-totp.com/signup")!){
+                        Text("Signup")
+                    
                             .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
                             .fontWeight(.bold)
                             .padding()
@@ -48,6 +52,7 @@ struct ContentView: View {
                             )
                     .padding(.horizontal, 20)
                     .padding(.top, 20)
+                    }
                     
                     Spacer()
                     Link("Privacy Policy", destination: URL(string: "https://zero-totp.com/privacy")!)

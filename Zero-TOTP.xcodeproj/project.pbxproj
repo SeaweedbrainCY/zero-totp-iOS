@@ -16,6 +16,9 @@
 		90DE5C512A950ED70030734B /* Zero_TOTPUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90DE5C502A950ED70030734B /* Zero_TOTPUITests.swift */; };
 		90DE5C532A950ED70030734B /* Zero_TOTPUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90DE5C522A950ED70030734B /* Zero_TOTPUITestsLaunchTests.swift */; };
 		90E2C3912BF6AF7B002C008E /* loginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90E2C3902BF6AF7B002C008E /* loginView.swift */; };
+		90E2C3942BF6F593002C008E /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90E2C3932BF6F593002C008E /* Toast.swift */; };
+		90E2C3972BF6FED6002C008E /* utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90E2C3962BF6FED6002C008E /* utils.swift */; };
+		90E2C39A2BF70638002C008E /* CryptoTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90E2C3992BF70638002C008E /* CryptoTools.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +51,9 @@
 		90DE5C502A950ED70030734B /* Zero_TOTPUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zero_TOTPUITests.swift; sourceTree = "<group>"; };
 		90DE5C522A950ED70030734B /* Zero_TOTPUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zero_TOTPUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		90E2C3902BF6AF7B002C008E /* loginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = loginView.swift; sourceTree = "<group>"; };
+		90E2C3932BF6F593002C008E /* Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
+		90E2C3962BF6FED6002C008E /* utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = utils.swift; sourceTree = "<group>"; };
+		90E2C3992BF70638002C008E /* CryptoTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoTools.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,6 +112,9 @@
 		90DE5C342A950ED40030734B /* Zero-TOTP */ = {
 			isa = PBXGroup;
 			children = (
+				90E2C3982BF7062A002C008E /* CryptoTools */,
+				90E2C3952BF6FECC002C008E /* Utils */,
+				90E2C3922BF6F584002C008E /* Components */,
 				90FA5F572BF2F75D0070BA8F /* Views */,
 				906D59112BE07E1F00629171 /* API */,
 				90DE5C392A950ED60030734B /* Assets.xcassets */,
@@ -138,6 +147,30 @@
 				90DE5C522A950ED70030734B /* Zero_TOTPUITestsLaunchTests.swift */,
 			);
 			path = "Zero-TOTPUITests";
+			sourceTree = "<group>";
+		};
+		90E2C3922BF6F584002C008E /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				90E2C3932BF6F593002C008E /* Toast.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		90E2C3952BF6FECC002C008E /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				90E2C3962BF6FED6002C008E /* utils.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		90E2C3982BF7062A002C008E /* CryptoTools */ = {
+			isa = PBXGroup;
+			children = (
+				90E2C3992BF70638002C008E /* CryptoTools.swift */,
+			);
+			path = CryptoTools;
 			sourceTree = "<group>";
 		};
 		90FA5F572BF2F75D0070BA8F /* Views */ = {
@@ -281,7 +314,10 @@
 			files = (
 				906D59132BE07E3B00629171 /* api.swift in Sources */,
 				90DE5C362A950ED40030734B /* homeView.swift in Sources */,
+				90E2C3942BF6F593002C008E /* Toast.swift in Sources */,
+				90E2C3972BF6FED6002C008E /* utils.swift in Sources */,
 				90E2C3912BF6AF7B002C008E /* loginView.swift in Sources */,
+				90E2C39A2BF70638002C008E /* CryptoTools.swift in Sources */,
 				907886D12BF30F510039E30E /* Zero_TOTP_App.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

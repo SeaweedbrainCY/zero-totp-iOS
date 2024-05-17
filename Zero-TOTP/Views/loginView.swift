@@ -7,10 +7,39 @@
 
 import Foundation
 import SwiftUI
+import UIKit
+
+
+
 
 struct LoginView: View {
     @State private var email: String = ""
     @State private var passphrase: String = ""
+    @State private var toast: FancyToast? = nil
+
+    
+    func loginflow(email:String, passphrase:String){
+        let api = API()
+        DispatchQueue.global().async {
+            Task {
+                let specs = await api.getLoginSpec(username: email)
+                if (specs.status == 200){
+                    let salt = specs.message
+                    let crypto_tool = CryptoTools()
+                    let hashed_passphrase = await crypto_tool.hashPassphrase(passphrase: passphrase, salt: salt)
+                    print(hashed_passphrase)
+                } else {
+                    if(specs.status == 400){
+                        toast = FancyToast(type: .error, title: "Bad email", message: "Are your sure about your mail ?")
+                    } else {
+                        toast = FancyToast(type: .error, title: "Error \(specs.status)", message: "\(specs.message)")
+                    }
+                }
+            }
+        }
+    }
+    
+    
     var body: some View {
         ZStack {
             Color("dark").ignoresSafeArea()
@@ -29,7 +58,10 @@ struct LoginView: View {
                 HStack{
                     Text(Image(systemName: "envelope"))
                     TextField("Your Email", text:$email)
-                    
+                        .keyboardType(.emailAddress)
+                          .textContentType(.emailAddress)
+                          .disableAutocorrection(true)
+                          .autocapitalization(.none)
                         .preferredColorScheme(.dark)
                         .foregroundColor(.white)
                         .bold()
@@ -45,9 +77,10 @@ struct LoginView: View {
                 }.padding(.horizontal, 40).padding(.bottom, 50)
                 
                 Button(action: {
-                    // Action du deuxième bouton
+                    
+                    self.loginflow(email: self.email, passphrase: self.passphrase)
                 }) {
-                    Text("Decrypt")
+                    Text("\(Image(systemName:"lock.circle.dotted")) Decrypt")
                         .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
                         .fontWeight(.bold)
                         .padding(.vertical, 10)
@@ -70,6 +103,8 @@ struct LoginView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .toastView(toast: $toast)
+        .gesture(DragGesture().onChanged{_ in UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)})
     }
 }
 
