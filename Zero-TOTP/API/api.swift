@@ -10,10 +10,11 @@ import Foundation
 
 
 class API {
-    var zero_totp_url = URL(string: "https://zero-totp.com")!
+    var zero_totp_base_url: URLComponents = URLComponents(string: "https://zero-totp.com")!
     
-    init(url:URL){
-        self.zero_totp_url = url
+    init(url:URLComponents){
+        self.zero_totp_base_url = url
+        
     }
     
     enum NetworkError: Error {
@@ -61,11 +62,12 @@ class API {
     
     func authenticationFlow(username: String,passphrase: String) async -> AuthenticationFlowResult {
         var api_response = AuthenticationFlowResult(status: 0, message: "", derivedKeySalt: "");
-        var generic_errors = ["generic_errors.invalid_creds": "Invalid credentials", "generic_errors.missing_params":"Information are missing. Make sure that Zero-TOTP is up to date", "generic_errors.bad_email":""]
+        let generic_errors = ["generic_errors.invalid_creds": "Invalid credentials", "generic_errors.missing_params":"Information are missing. Make sure that Zero-TOTP is up to date", "generic_errors.bad_email":""]
 
         do {
-            let url = self.zero_totp_url.appending(path: "/api/v1/login")
-            var request = URLRequest(url: url)
+            var base_url = self.zero_totp_base_url
+            base_url.path = "/api/v1/login"
+            var request = URLRequest(url: base_url.url!)
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.httpMethod = "POST"
             let encoder = JSONEncoder()
@@ -113,9 +115,12 @@ class API {
         var api_response:HttpResponse = HttpResponse(status: 0, message: "");
 
         do {
-            let username_encoded = username.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? ""
-            let url = self.zero_totp_url.appending(path: "/api/v1/login/specs").appending(queryItems: [URLQueryItem(name: "username", value: username)]) 
-            let (data, response) = try await URLSession.shared.data(from: url)
+            let username_encoded = username.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? ""
+            var base_url = self.zero_totp_base_url
+            base_url.path = "/api/v1/login/specs"
+            base_url.percentEncodedQuery = "username=\(username_encoded)"
+            guard let final_url = base_url.url else { throw NetworkError.badUrl }
+            let (data, response) = try await URLSession.shared.data(from: final_url)
             guard let response = response as? HTTPURLResponse else { throw NetworkError.badResponse }
             if(response.statusCode != 200){
                 guard let decodedResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data) else { api_response.status = response.statusCode; throw NetworkError.failedToDecodeResponse }

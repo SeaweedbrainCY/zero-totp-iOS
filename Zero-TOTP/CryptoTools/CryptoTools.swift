@@ -15,6 +15,7 @@ class CryptoTools {
     
     enum CryptoError: Error {
         case SaltImportError;
+        case PassphraseImportError;
     }
     
     func hashPassphrase(passphrase:String, salt:String) async -> String? {
@@ -28,34 +29,45 @@ class CryptoTools {
             return Data(hash_data).base64EncodedString()
     }
     
-    func derivePassphrase(passphrase:String, derivationKeySalt:String) async -> String? {
+    func derivePassphrase(passphrase:String, derivationKeySalt:String) async -> Data? {
         do {
             
-            guard let passphraseData = passphrase.data(using: .utf8) else { return nil }
+            guard let passphraseData = passphrase.data(using: .utf8) else { throw CryptoError.PassphraseImportError }
             let derivationKeySaltData = Data(base64Encoded: derivationKeySalt)
+            if (derivationKeySaltData == nil) {throw CryptoError.PassphraseImportError}
             if(derivationKeySaltData == nil) {throw CryptoError.SaltImportError}
-            var derivedKeyData = Data(repeating: 0, count: passphraseData.count)
-            let derivedCount = derivedKeyData.count
+            
+            let keyByteCount = 32; // 256 bits
+            var derivedKeyData = Data( count: keyByteCount)
+            
+            
             let derivationStatus = derivedKeyData.withUnsafeMutableBytes { derivedKeyBytes in
-                derivationKeySaltData!.withUnsafeBytes { saltBytes in
-                    CCKeyDerivationPBKDF(
-                        CCPBKDFAlgorithm(kCCPBKDF2),
-                        passphrase,
-                        passphraseData.count,
-                        saltBytes,
-                        derivationKeySaltData!.count,
-                        CCPseudoRandomAlgorithm(kCCPRFHmacAlgSHA256),
-                        UInt32(self.pbkdf2_iterations),
-                        derivedKeyBytes,
-                        derivedCount)
+                    return derivationKeySaltData!.withUnsafeBytes { saltBytes in
+                        let derivedKeyPointer = derivedKeyBytes.baseAddress!.assumingMemoryBound(to: UInt8.self)
+                        let saltPointer = saltBytes.baseAddress!.assumingMemoryBound(to: UInt8.self)
+
+                        return CCKeyDerivationPBKDF(
+                            CCPBKDFAlgorithm(kCCPBKDF2),
+                            passphrase, passphraseData.count,
+                            saltPointer, derivationKeySaltData!.count,
+                            CCPseudoRandomAlgorithm(kCCPRFHmacAlgSHA256),
+                            UInt32(pbkdf2_iterations),
+                            derivedKeyPointer, keyByteCount
+                        )
+                    }
                 }
-            }
             return derivationStatus == kCCSuccess ? derivedKeyData : nil
+           
         } catch CryptoError.SaltImportError {
-            
+            print("Salt importError")
+            return nil
+        } catch CryptoError.PassphraseImportError {
+            print("Passphrase importError")
+            return nil
         } catch {
-            
-            
+            print("Generic error happened")
+            return nil
         }
+        
     }
 }

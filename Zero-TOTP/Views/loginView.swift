@@ -17,8 +17,7 @@ struct LoginView: View {
     @State private var passphrase: String = ""
     @State private var toast: FancyToast? = nil
     @State private var showingCustomURLAlert = false
-    @State private var zero_totp_url = URL(string: "https://zero-totp.com")!
-    @State private var zero_totp_domain = "zero-totp.com"
+    @State private var zero_totp_url = URLComponents(string: "https://zero-totp.com")!
     @State private var customURL = ""
     @State private var isLoading = false
 
@@ -38,10 +37,14 @@ struct LoginView: View {
                     let hashed_passphrase = await crypto_tool.hashPassphrase(passphrase: passphrase, salt: salt)
                     let login_flow = await api.authenticationFlow(username: email, passphrase: hashed_passphrase ?? "")
                     if (login_flow.status == 200){
-                        await MainActor.run {
-                            toast = FancyToast(type: .success , title: "Welcome back 🎉", message: "")
-                            isLoading = false
+                        if let derivedKey = await crypto_tool.derivePassphrase(passphrase: passphrase, derivationKeySalt: login_flow.derivedKeySalt) {
+                            print("Derived key (hex): \(derivedKey.map { String(format: "%02x", $0) }.joined())")
+                            await MainActor.run {
+                                toast = FancyToast(type: .success , title: "Welcome back 🎉", message: "")
+                                isLoading = false
+                            }
                         }
+                        
                     } else {
                         await MainActor.run {
                             toast = FancyToast(type: .error, title: "Error \(login_flow.status)", message: "\(login_flow.message)")
@@ -52,7 +55,7 @@ struct LoginView: View {
                     
                 } else {
                     await MainActor.run {
-                        toast = FancyToast(type: .error, title: "Error \(specs.status)", message: "Error initiate the login flow. \(specs.message)")
+                        toast = FancyToast(type: .error, title: "Error \(specs.status)", message: "Error while initiating the login flow. \(specs.message)")
                         isLoading = false
                     }
                 }
@@ -63,11 +66,14 @@ struct LoginView: View {
     func setCustomURL(url:String){
         if(url.range(of: "((([A-Za-z]{3,9}:(?:\\/\\/)?)(?:[-;:&=\\+\\$,\\w]+@)?[A-Za-z0-9.-]+(:[0-9]+)?|(?:www.|[-;:&=\\+\\$,\\w]+@)[A-Za-z0-9.-]+)((?:\\/[\\+~%\\/.\\w\\-_]*)?\\??(?:[-\\+=&;%@.\\w_]*)#?(?:[\\w]*))?)",  options: .regularExpression, range: nil, locale: nil)) == nil {
             toast = FancyToast(type: .error, title: "Invalid URL", message: "Please provide a valid URL for your custom Zero-TOTP instance")
-            zero_totp_url = URL(string: "https://zero-totp.com")!
+            zero_totp_url = URLComponents(string: "https://zero-totp.com")!
         } else {
-            zero_totp_url = URL(string: url)!
-            zero_totp_domain = zero_totp_url.host()!
-            
+            guard let url_component = URLComponents(string: url) else {
+                toast = FancyToast(type: .error, title: "Invalid URL", message: "Please provide a valid URL for your custom Zero-TOTP instance")
+                zero_totp_url = URLComponents(string: "https://zero-totp.com")!
+                return
+            }
+            self.zero_totp_url = url_component
         }
         
     }
@@ -150,7 +156,7 @@ struct LoginView: View {
                 HStack {
                     
                     Text("Zero-TOTP instance : ")
-                    Button("\(zero_totp_url.host() ?? "Invalid domain") \(Image(systemName:"pencil"))"){
+                    Button("\(zero_totp_url.host ?? "Invalid domain") \(Image(systemName:"pencil"))"){
                         showingCustomURLAlert.toggle()
                     }.foregroundColor(.info).alert("Enter your custom server URL", isPresented: $showingCustomURLAlert) {
                         TextField("https://zero-totp.com", text: $customURL, prompt: Text(verbatim:"https://zero-totp.com").foregroundStyle(.gray)).autocapitalization(.none)
