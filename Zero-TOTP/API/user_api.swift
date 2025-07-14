@@ -1,5 +1,5 @@
 //
-//  api.swift
+//  user_api.swift
 //  Zero-TOTP
 //
 //  Created by Stchepinsky Nathan on 29/04/2024.
@@ -9,12 +9,14 @@ import Foundation
 
 
 
-class API {
-    var zero_totp_base_url: URLComponents = URLComponents(string: "https://zero-totp.com")!
+class UserAPI {
+    private var zero_totp_base_url: URLComponents = URLComponents(string: "https://zero-totp.com")!
     
-    init(url:URLComponents){
-        self.zero_totp_base_url = url
-        
+    init(){
+        let defaults = UserDefaults.standard
+        if let baseUrlString = defaults.string(forKey: "zero_totp_base_url") {
+            zero_totp_base_url = URLComponents(string: baseUrlString) ?? URLComponents(string: "https://zero-totp.com")!
+        }
     }
     
     enum NetworkError: Error {

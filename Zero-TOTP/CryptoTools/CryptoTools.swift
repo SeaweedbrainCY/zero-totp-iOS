@@ -70,4 +70,30 @@ class CryptoTools {
         }
         
     }
+    
+    func decryptZKEKey(encryptedZKEKey: String, derivedPassphrase:Data)-> String? {
+        let encrypted_parts = encryptedZKEKey.split(separator: ",")
+        if (encrypted_parts.count < 2) {
+            print("Error. Invalidly formatted encrypted ZKE key")
+            return nil;
+        }
+        
+        let cipher_data: Data? = Data(base64Encoded: String(encrypted_parts[0]))
+        let iv_data: Data? = Data(base64Encoded: String(encrypted_parts[1]))
+        if(cipher_data == nil){
+            print("Error. Was decrypted ZKE key, but an error occured while decoding the cipher from b64.");
+            return nil;
+        } else if (iv_data == nil){
+            print("Error. Was decrypted ZKE key, but an error occured while decoding the iv from b64.");
+            return nil;
+        }
+        do {
+            let sealedBox = try AES.GCM.SealedBox(nonce: AES.GCM.Nonce(data: iv_data!), ciphertext: cipher_data!, tag: Data())
+            let decryptedData = try AES.GCM.open(sealedBox, using: SymmetricKey(data: derivedPassphrase))
+            return String(data: decryptedData, encoding: .utf8)
+        } catch  {
+            print("Error. ZKE decryption failed. Invalid key. \(error)")
+            return nil;
+        }
+    }
 }

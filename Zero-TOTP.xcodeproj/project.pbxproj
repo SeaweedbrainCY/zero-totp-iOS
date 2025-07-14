@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		906D59132BE07E3B00629171 /* api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 906D59122BE07E3B00629171 /* api.swift */; };
+		903DBB192E254A6F00522F7C /* vault_api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 903DBB182E254A6900522F7C /* vault_api.swift */; };
+		906D59132BE07E3B00629171 /* user_api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 906D59122BE07E3B00629171 /* user_api.swift */; };
 		907886D12BF30F510039E30E /* Zero_TOTP_App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 907886D02BF30F510039E30E /* Zero_TOTP_App.swift */; };
 		90DE5C362A950ED40030734B /* homeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90DE5C352A950ED40030734B /* homeView.swift */; };
 		90DE5C3A2A950ED60030734B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 90DE5C392A950ED60030734B /* Assets.xcassets */; };
@@ -39,7 +40,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		906D59122BE07E3B00629171 /* api.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = api.swift; sourceTree = "<group>"; };
+		903DBB182E254A6900522F7C /* vault_api.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vault_api.swift; sourceTree = "<group>"; };
+		906D59122BE07E3B00629171 /* user_api.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = user_api.swift; sourceTree = "<group>"; };
 		907886D02BF30F510039E30E /* Zero_TOTP_App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zero_TOTP_App.swift; sourceTree = "<group>"; };
 		90DE5C322A950ED40030734B /* Zero-TOTP.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Zero-TOTP.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		90DE5C352A950ED40030734B /* homeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = homeView.swift; sourceTree = "<group>"; };
@@ -84,7 +86,8 @@
 		906D59112BE07E1F00629171 /* API */ = {
 			isa = PBXGroup;
 			children = (
-				906D59122BE07E3B00629171 /* api.swift */,
+				903DBB182E254A6900522F7C /* vault_api.swift */,
+				906D59122BE07E3B00629171 /* user_api.swift */,
 			);
 			path = API;
 			sourceTree = "<group>";
@@ -312,13 +315,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				906D59132BE07E3B00629171 /* api.swift in Sources */,
+				906D59132BE07E3B00629171 /* user_api.swift in Sources */,
 				90DE5C362A950ED40030734B /* homeView.swift in Sources */,
 				90E2C3942BF6F593002C008E /* Toast.swift in Sources */,
 				90E2C3972BF6FED6002C008E /* utils.swift in Sources */,
 				90E2C3912BF6AF7B002C008E /* loginView.swift in Sources */,
 				90E2C39A2BF70638002C008E /* CryptoTools.swift in Sources */,
 				907886D12BF30F510039E30E /* Zero_TOTP_App.swift in Sources */,
+				903DBB192E254A6F00522F7C /* vault_api.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

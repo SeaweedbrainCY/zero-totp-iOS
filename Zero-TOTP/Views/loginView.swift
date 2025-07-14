@@ -17,7 +17,7 @@ struct LoginView: View {
     @State private var passphrase: String = ""
     @State private var toast: FancyToast? = nil
     @State private var showingCustomURLAlert = false
-    @State private var zero_totp_url = URLComponents(string: "https://zero-totp.com")!
+    @State private var zero_totp_url = URLComponents(string: UserDefaults.standard.string(forKey: "zero_totp_base_url") ?? "https://zero-totp.com") ?? URLComponents(string: "https://zero-totp.com")!
     @State private var customURL = ""
     @State private var isLoading = false
 
@@ -27,21 +27,38 @@ struct LoginView: View {
         if(!isEmailFormatCorrect(email: email) || !isPassphraseFormatCorrect(passphrase: passphrase)){
             return
         }
-        let api = API(url:zero_totp_url)
+        let user_api = UserAPI()
+        let vault_api = VaultAPI()
         DispatchQueue.global().async {
             Task {
-                let specs = await api.getLoginSpec(username: email)
+                let specs = await user_api.getLoginSpec(username: email)
                 if (specs.status == 200){
                     let salt = specs.message
                     let crypto_tool = CryptoTools()
                     let hashed_passphrase = await crypto_tool.hashPassphrase(passphrase: passphrase, salt: salt)
-                    let login_flow = await api.authenticationFlow(username: email, passphrase: hashed_passphrase ?? "")
+                    let login_flow = await user_api.authenticationFlow(username: email, passphrase: hashed_passphrase ?? "")
                     if (login_flow.status == 200){
                         if let derivedKey = await crypto_tool.derivePassphrase(passphrase: passphrase, derivationKeySalt: login_flow.derivedKeySalt) {
-                            print("Derived key (hex): \(derivedKey.map { String(format: "%02x", $0) }.joined())")
-                            await MainActor.run {
-                                toast = FancyToast(type: .success , title: "Welcome back 🎉", message: "")
-                                isLoading = false
+                            let get_zke_flow: VaultAPI.ZKEEncryptedKeyFlowResult = await vault_api.get_zke_encrypted_key()
+                                if (get_zke_flow.status == 200){
+                                    let decrypted_zke_key = crypto_tool.decryptZKEKey(encryptedZKEKey: get_zke_flow.zke_encrypted_key!, derivedPassphrase: derivedKey)
+                                    if (decrypted_zke_key != nil){
+                                        await MainActor.run {
+                                            toast = FancyToast(type: .success , title: "Welcome back 🎉", message: "")
+                                            isLoading = false
+                                        }
+                                } else {
+                                    await MainActor.run {
+                                        toast = FancyToast(type: .error, title: "Error occured while decrypting your keys", message: "Error code 0x1")
+                                        isLoading = false
+                                    }
+                                    
+                                }
+                            } else {
+                                await MainActor.run {
+                                    toast = FancyToast(type: .error, title: "Error \(get_zke_flow.status)", message: "\(get_zke_flow.message)")
+                                    isLoading = false
+                                }
                             }
                         }
                         
@@ -66,14 +83,14 @@ struct LoginView: View {
     func setCustomURL(url:String){
         if(url.range(of: "((([A-Za-z]{3,9}:(?:\\/\\/)?)(?:[-;:&=\\+\\$,\\w]+@)?[A-Za-z0-9.-]+(:[0-9]+)?|(?:www.|[-;:&=\\+\\$,\\w]+@)[A-Za-z0-9.-]+)((?:\\/[\\+~%\\/.\\w\\-_]*)?\\??(?:[-\\+=&;%@.\\w_]*)#?(?:[\\w]*))?)",  options: .regularExpression, range: nil, locale: nil)) == nil {
             toast = FancyToast(type: .error, title: "Invalid URL", message: "Please provide a valid URL for your custom Zero-TOTP instance")
-            zero_totp_url = URLComponents(string: "https://zero-totp.com")!
         } else {
             guard let url_component = URLComponents(string: url) else {
                 toast = FancyToast(type: .error, title: "Invalid URL", message: "Please provide a valid URL for your custom Zero-TOTP instance")
-                zero_totp_url = URLComponents(string: "https://zero-totp.com")!
                 return
             }
             self.zero_totp_url = url_component
+            let defaults = UserDefaults.standard
+            defaults.set(url, forKey: "zero_totp_base_url")
         }
         
     }
