@@ -12,7 +12,7 @@ import Foundation
 struct ZeroTOTPApp: App {
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            GeneralTabView()
         }
     }
 }

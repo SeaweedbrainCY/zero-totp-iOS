@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		900DBB702E26975000B70239 /* vaultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 900DBB6F2E26974700B70239 /* vaultView.swift */; };
+		900DBB742E26A02800B70239 /* generalTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 900DBB732E26A02100B70239 /* generalTabView.swift */; };
 		903DBB192E254A6F00522F7C /* vault_api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 903DBB182E254A6900522F7C /* vault_api.swift */; };
 		906D59132BE07E3B00629171 /* user_api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 906D59122BE07E3B00629171 /* user_api.swift */; };
 		907886D12BF30F510039E30E /* Zero_TOTP_App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 907886D02BF30F510039E30E /* Zero_TOTP_App.swift */; };
@@ -42,6 +43,7 @@
 
 /* Begin PBXFileReference section */
 		900DBB6F2E26974700B70239 /* vaultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vaultView.swift; sourceTree = "<group>"; };
+		900DBB732E26A02100B70239 /* generalTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = generalTabView.swift; sourceTree = "<group>"; };
 		903DBB182E254A6900522F7C /* vault_api.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vault_api.swift; sourceTree = "<group>"; };
 		906D59122BE07E3B00629171 /* user_api.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = user_api.swift; sourceTree = "<group>"; };
 		907886D02BF30F510039E30E /* Zero_TOTP_App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zero_TOTP_App.swift; sourceTree = "<group>"; };
@@ -181,6 +183,7 @@
 		90FA5F572BF2F75D0070BA8F /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				900DBB732E26A02100B70239 /* generalTabView.swift */,
 				900DBB6F2E26974700B70239 /* vaultView.swift */,
 				90DE5C352A950ED40030734B /* homeView.swift */,
 				90E2C3902BF6AF7B002C008E /* loginView.swift */,
@@ -327,6 +330,7 @@
 				90E2C39A2BF70638002C008E /* CryptoTools.swift in Sources */,
 				907886D12BF30F510039E30E /* Zero_TOTP_App.swift in Sources */,
 				903DBB192E254A6F00522F7C /* vault_api.swift in Sources */,
+				900DBB742E26A02800B70239 /* generalTabView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -498,6 +502,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -527,6 +532,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
