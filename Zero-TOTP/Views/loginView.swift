@@ -41,18 +41,33 @@ struct LoginView: View {
                         if let derivedKey = await crypto_tool.derivePassphrase(passphrase: passphrase, derivationKeySalt: login_flow.derivedKeySalt) {
                             let get_zke_flow: VaultAPI.ZKEEncryptedKeyFlowResult = await vault_api.get_zke_encrypted_key()
                                 if (get_zke_flow.status == 200){
-                                    let decrypted_zke_key = crypto_tool.decryptZKEKey(encryptedZKEKey: get_zke_flow.zke_encrypted_key!, derivedPassphrase: derivedKey)
+                                    let decrypted_zke_key = crypto_tool.decryptZKEKey(encryptedZKEKey: get_zke_flow.zke_encrypted_key!, derivedPassphraseData: derivedKey)
                                     if (decrypted_zke_key != nil){
-                                        await MainActor.run {
-                                            toast = FancyToast(type: .success , title: "Welcome back 🎉", message: "")
-                                            isLoading = false
+                                        let decrypted_zke_key_data = Data(base64Encoded: decrypted_zke_key!)
+                                        if (decrypted_zke_key_data != nil){
+                                            if (crypto_tool.storeZKEKeyInKeychain(decrypted_zke_key_data!, account_id: login_flow.id)){
+                                                await MainActor.run {
+                                                    toast = FancyToast(type: .success , title: "Welcome back 🎉", message: "")
+                                                    isLoading = false
+                                                }
+                                            } else {
+                                                await MainActor.run {
+                                                    toast = FancyToast(type: .error, title: "Error occured while storing your keys", message: "Error code 0x3")
+                                                    isLoading = false
+                                                }
+                                            }
+                                        } else {
+                                            await MainActor.run {
+                                                toast = FancyToast(type: .error, title: "Error occured while decoded your keys", message: "Error code 0x2")
+                                                isLoading = false
+                                            }
                                         }
+                                        
                                 } else {
                                     await MainActor.run {
                                         toast = FancyToast(type: .error, title: "Error occured while decrypting your keys", message: "Error code 0x1")
                                         isLoading = false
                                     }
-                                    
                                 }
                             } else {
                                 await MainActor.run {

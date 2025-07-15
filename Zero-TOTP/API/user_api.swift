@@ -48,6 +48,7 @@ class UserAPI {
         var status: Int;
         var message: String;
         var derivedKeySalt: String;
+        var id:Int;
     }
     
     struct ErrorResponse: Codable {
@@ -63,7 +64,7 @@ class UserAPI {
     
     
     func authenticationFlow(username: String,passphrase: String) async -> AuthenticationFlowResult {
-        var api_response = AuthenticationFlowResult(status: 0, message: "", derivedKeySalt: "");
+        var api_response = AuthenticationFlowResult(status: 0, message: "", derivedKeySalt: "", id:0);
         let generic_errors = ["generic_errors.invalid_creds": "Invalid credentials", "generic_errors.missing_params":"Information are missing. Make sure that Zero-TOTP is up to date", "generic_errors.bad_email":""]
 
         do {
@@ -91,6 +92,7 @@ class UserAPI {
                 api_response.status = response.statusCode
                 api_response.message = "OK"
                 api_response.derivedKeySalt = decodedResponse.derivedKeySalt
+                api_response.id = decodedResponse.id
                 
                 
             

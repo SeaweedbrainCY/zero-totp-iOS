@@ -8,6 +8,8 @@
 import Foundation
 import CryptoKit
 import CommonCrypto
+import LocalAuthentication
+import Security
 
 class CryptoTools {
     
@@ -71,7 +73,7 @@ class CryptoTools {
         
     }
     
-    func decryptZKEKey(encryptedZKEKey: String, derivedPassphrase:Data)-> String? {
+    func decryptZKEKey(encryptedZKEKey: String, derivedPassphraseData:Data)-> String? {
         let encrypted_parts = encryptedZKEKey.split(separator: ",")
         if (encrypted_parts.count < 2) {
             print("Error. Invalidly formatted encrypted ZKE key")
@@ -88,12 +90,41 @@ class CryptoTools {
             return nil;
         }
         do {
-            let sealedBox = try AES.GCM.SealedBox(nonce: AES.GCM.Nonce(data: iv_data!), ciphertext: cipher_data!, tag: Data())
-            let decryptedData = try AES.GCM.open(sealedBox, using: SymmetricKey(data: derivedPassphrase))
+            print("key size : \(derivedPassphraseData.count)")
+            let derivedPassphrase = SymmetricKey(data: derivedPassphraseData)
+            let sealedBox = try AES.GCM.SealedBox(combined: iv_data! + cipher_data!) // tag is already included at the end of the cipher
+            //let sealedBox = try AES.GCM.SealedBox(nonce: AES.GCM.Nonce(data: iv_data!), ciphertext: cipher_data!, tag: Data())
+            let decryptedData = try AES.GCM.open(sealedBox, using: derivedPassphrase)
             return String(data: decryptedData, encoding: .utf8)
         } catch  {
             print("Error. ZKE decryption failed. Invalid key. \(error)")
             return nil;
         }
+    }
+    
+    
+    func storeZKEKeyInKeychain(_ zke_key_data: Data, account_id:Int)-> Bool{
+        guard let accessControl = SecAccessControlCreateWithFlags(nil,
+                                                                      kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
+                                                                      [.userPresence],
+                                                                      nil) else {
+                print("Failed to create access control")
+                return false
+            }
+        let tag = "com.zero-totp.zke_key.user.\(account_id)".data(using: .utf8)!
+        let query: [String:Any] = [kSecClass as String: kSecClassKey,
+                                      kSecAttrApplicationTag as String: tag,
+                                      kSecValueData as String: zke_key_data,
+                                      kSecAttrAccessControl as String: accessControl];
+        
+
+        SecItemDelete(query as CFDictionary);
+
+        
+        // Store the key
+        
+        let set_status = SecItemAdd(query as CFDictionary, nil);
+        print(set_status)
+        return set_status == errSecSuccess;
     }
 }
