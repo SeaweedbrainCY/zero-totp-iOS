@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		900DBB702E26975000B70239 /* vaultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 900DBB6F2E26974700B70239 /* vaultView.swift */; };
 		900DBB742E26A02800B70239 /* generalTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 900DBB732E26A02100B70239 /* generalTabView.swift */; };
+		900DBB772E2714CC00B70239 /* ComponentsKit in Frameworks */ = {isa = PBXBuildFile; productRef = 900DBB762E2714CC00B70239 /* ComponentsKit */; };
 		903DBB192E254A6F00522F7C /* vault_api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 903DBB182E254A6900522F7C /* vault_api.swift */; };
 		906D59132BE07E3B00629171 /* user_api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 906D59122BE07E3B00629171 /* user_api.swift */; };
 		907886D12BF30F510039E30E /* Zero_TOTP_App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 907886D02BF30F510039E30E /* Zero_TOTP_App.swift */; };
@@ -67,6 +68,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				900DBB772E2714CC00B70239 /* ComponentsKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -279,6 +281,9 @@
 				Base,
 			);
 			mainGroup = 90DE5C292A950ED40030734B;
+			packageReferences = (
+				900DBB752E2714CB00B70239 /* XCRemoteSwiftPackageReference "ComponentsKit" */,
+			);
 			productRefGroup = 90DE5C332A950ED40030734B /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -662,6 +667,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		900DBB752E2714CB00B70239 /* XCRemoteSwiftPackageReference "ComponentsKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/componentskit/ComponentsKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.5.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		900DBB762E2714CC00B70239 /* ComponentsKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 900DBB752E2714CB00B70239 /* XCRemoteSwiftPackageReference "ComponentsKit" */;
+			productName = ComponentsKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 90DE5C2A2A950ED40030734B /* Project object */;
 }
