@@ -9,10 +9,12 @@
 /* Begin PBXBuildFile section */
 		900DBB702E26975000B70239 /* vaultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 900DBB6F2E26974700B70239 /* vaultView.swift */; };
 		900DBB742E26A02800B70239 /* generalTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 900DBB732E26A02100B70239 /* generalTabView.swift */; };
-		900DBB772E2714CC00B70239 /* ComponentsKit in Frameworks */ = {isa = PBXBuildFile; productRef = 900DBB762E2714CC00B70239 /* ComponentsKit */; };
 		903DBB192E254A6F00522F7C /* vault_api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 903DBB182E254A6900522F7C /* vault_api.swift */; };
 		906D59132BE07E3B00629171 /* user_api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 906D59122BE07E3B00629171 /* user_api.swift */; };
 		907886D12BF30F510039E30E /* Zero_TOTP_App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 907886D02BF30F510039E30E /* Zero_TOTP_App.swift */; };
+		9094AAD62E297B75009EC03B /* VaultViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9094AAD52E297B6E009EC03B /* VaultViewModel.swift */; };
+		9094AADB2E2996E9009EC03B /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9094AADA2E2996E5009EC03B /* NetworkManager.swift */; };
+		9094AADF2E2AA41F009EC03B /* SwiftOTP in Frameworks */ = {isa = PBXBuildFile; productRef = 9094AADE2E2AA41F009EC03B /* SwiftOTP */; };
 		90DE5C362A950ED40030734B /* homeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90DE5C352A950ED40030734B /* homeView.swift */; };
 		90DE5C3A2A950ED60030734B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 90DE5C392A950ED60030734B /* Assets.xcassets */; };
 		90DE5C3D2A950ED60030734B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 90DE5C3C2A950ED60030734B /* Preview Assets.xcassets */; };
@@ -48,6 +50,8 @@
 		903DBB182E254A6900522F7C /* vault_api.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vault_api.swift; sourceTree = "<group>"; };
 		906D59122BE07E3B00629171 /* user_api.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = user_api.swift; sourceTree = "<group>"; };
 		907886D02BF30F510039E30E /* Zero_TOTP_App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zero_TOTP_App.swift; sourceTree = "<group>"; };
+		9094AAD52E297B6E009EC03B /* VaultViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultViewModel.swift; sourceTree = "<group>"; };
+		9094AADA2E2996E5009EC03B /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		90DE5C322A950ED40030734B /* Zero-TOTP.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Zero-TOTP.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		90DE5C352A950ED40030734B /* homeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = homeView.swift; sourceTree = "<group>"; };
 		90DE5C392A950ED60030734B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -68,7 +72,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				900DBB772E2714CC00B70239 /* ComponentsKit in Frameworks */,
+				9094AADF2E2AA41F009EC03B /* SwiftOTP in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -98,6 +102,22 @@
 			path = API;
 			sourceTree = "<group>";
 		};
+		9094AAD42E297B5E009EC03B /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				9094AAD52E297B6E009EC03B /* VaultViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		9094AAD92E2996D8009EC03B /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				9094AADA2E2996E5009EC03B /* NetworkManager.swift */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
 		90DE5C292A950ED40030734B = {
 			isa = PBXGroup;
 			children = (
@@ -121,6 +141,7 @@
 		90DE5C342A950ED40030734B /* Zero-TOTP */ = {
 			isa = PBXGroup;
 			children = (
+				9094AAD92E2996D8009EC03B /* Network */,
 				90E2C3982BF7062A002C008E /* CryptoTools */,
 				90E2C3952BF6FECC002C008E /* Utils */,
 				90E2C3922BF6F584002C008E /* Components */,
@@ -129,6 +150,7 @@
 				90DE5C392A950ED60030734B /* Assets.xcassets */,
 				90DE5C3B2A950ED60030734B /* Preview Content */,
 				907886D02BF30F510039E30E /* Zero_TOTP_App.swift */,
+				9094AAD42E297B5E009EC03B /* ViewModel */,
 			);
 			path = "Zero-TOTP";
 			sourceTree = "<group>";
@@ -282,7 +304,7 @@
 			);
 			mainGroup = 90DE5C292A950ED40030734B;
 			packageReferences = (
-				900DBB752E2714CB00B70239 /* XCRemoteSwiftPackageReference "ComponentsKit" */,
+				9094AADD2E2AA41F009EC03B /* XCRemoteSwiftPackageReference "SwiftOTP" */,
 			);
 			productRefGroup = 90DE5C332A950ED40030734B /* Products */;
 			projectDirPath = "";
@@ -326,8 +348,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9094AADB2E2996E9009EC03B /* NetworkManager.swift in Sources */,
 				906D59132BE07E3B00629171 /* user_api.swift in Sources */,
 				90DE5C362A950ED40030734B /* homeView.swift in Sources */,
+				9094AAD62E297B75009EC03B /* VaultViewModel.swift in Sources */,
 				90E2C3942BF6F593002C008E /* Toast.swift in Sources */,
 				90E2C3972BF6FED6002C008E /* utils.swift in Sources */,
 				900DBB702E26975000B70239 /* vaultView.swift in Sources */,
@@ -502,6 +526,8 @@
 				DEVELOPMENT_TEAM = 3T8JC8YTSR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Zero-TOTP/Info.plist";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Zero-TOTP securely store your decryption key in your Keychain, protected by your biometrics";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -532,6 +558,8 @@
 				DEVELOPMENT_TEAM = 3T8JC8YTSR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Zero-TOTP/Info.plist";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Zero-TOTP securely store your decryption key in your Keychain, protected by your biometrics";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -669,21 +697,21 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		900DBB752E2714CB00B70239 /* XCRemoteSwiftPackageReference "ComponentsKit" */ = {
+		9094AADD2E2AA41F009EC03B /* XCRemoteSwiftPackageReference "SwiftOTP" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/componentskit/ComponentsKit";
+			repositoryURL = "https://github.com/lachlanbell/SwiftOTP.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.5.3;
+				minimumVersion = 3.0.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		900DBB762E2714CC00B70239 /* ComponentsKit */ = {
+		9094AADE2E2AA41F009EC03B /* SwiftOTP */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 900DBB752E2714CB00B70239 /* XCRemoteSwiftPackageReference "ComponentsKit" */;
-			productName = ComponentsKit;
+			package = 9094AADD2E2AA41F009EC03B /* XCRemoteSwiftPackageReference "SwiftOTP" */;
+			productName = SwiftOTP;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -30,8 +30,8 @@
             filePath = "Zero-TOTP/Views/loginView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "170"
-            endingLineNumber = "170"
+            startingLineNumber = "186"
+            endingLineNumber = "186"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -78,22 +78,6 @@
             filePath = "Zero-TOTP/CryptoTools/CryptoTools.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "94"
-            endingLineNumber = "94"
-            landmarkName = "decryptZKEKey(encryptedZKEKey:derivedPassphraseData:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "C976EB1D-7BA9-416D-8671-47DC55605F5B"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Zero-TOTP/CryptoTools/CryptoTools.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
             startingLineNumber = "93"
             endingLineNumber = "93"
             landmarkName = "decryptZKEKey(encryptedZKEKey:derivedPassphraseData:)"
@@ -110,8 +94,8 @@
             filePath = "Zero-TOTP/CryptoTools/CryptoTools.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "95"
-            endingLineNumber = "95"
+            startingLineNumber = "94"
+            endingLineNumber = "94"
             landmarkName = "decryptZKEKey(encryptedZKEKey:derivedPassphraseData:)"
             landmarkType = "7">
          </BreakpointContent>

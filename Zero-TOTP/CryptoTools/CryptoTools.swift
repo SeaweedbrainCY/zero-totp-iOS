@@ -73,8 +73,8 @@ class CryptoTools {
         
     }
     
-    func decryptZKEKey(encryptedZKEKey: String, derivedPassphraseData:Data)-> String? {
-        let encrypted_parts = encryptedZKEKey.split(separator: ",")
+    func aes_decrypt(encrypted_cipher: String, key_data:Data)-> String? {
+        let encrypted_parts = encrypted_cipher.split(separator: ",")
         if (encrypted_parts.count < 2) {
             print("Error. Invalidly formatted encrypted ZKE key")
             return nil;
@@ -83,15 +83,14 @@ class CryptoTools {
         let cipher_data: Data? = Data(base64Encoded: String(encrypted_parts[0]))
         let iv_data: Data? = Data(base64Encoded: String(encrypted_parts[1]))
         if(cipher_data == nil){
-            print("Error. Was decrypted ZKE key, but an error occured while decoding the cipher from b64.");
+            print("Error. Was AES decrypting, but an error occured while decoding the cipher from b64.");
             return nil;
         } else if (iv_data == nil){
-            print("Error. Was decrypted ZKE key, but an error occured while decoding the iv from b64.");
+            print("Error. Was AES decrypting, but an error occured while decoding the iv from b64.");
             return nil;
         }
         do {
-            print("key size : \(derivedPassphraseData.count)")
-            let derivedPassphrase = SymmetricKey(data: derivedPassphraseData)
+            let derivedPassphrase = SymmetricKey(data: key_data)
             let sealedBox = try AES.GCM.SealedBox(combined: iv_data! + cipher_data!) // tag is already included at the end of the cipher
             //let sealedBox = try AES.GCM.SealedBox(nonce: AES.GCM.Nonce(data: iv_data!), ciphertext: cipher_data!, tag: Data())
             let decryptedData = try AES.GCM.open(sealedBox, using: derivedPassphrase)
@@ -103,15 +102,15 @@ class CryptoTools {
     }
     
     
-    func storeZKEKeyInKeychain(_ zke_key_data: Data, account_id:Int)-> Bool{
+    func storeZKEKeyInKeychain(_ zke_key_data: Data, user_id:Int)-> Bool{
         guard let accessControl = SecAccessControlCreateWithFlags(nil,
                                                                       kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
-                                                                      [.userPresence],
+                                                                      .biometryCurrentSet,
                                                                       nil) else {
                 print("Failed to create access control")
                 return false
             }
-        let tag = "com.zero-totp.zke_key.user.\(account_id)".data(using: .utf8)!
+        let tag = "com.zero-totp.zke_key.user.\(user_id)".data(using: .utf8)!
         let query: [String:Any] = [kSecClass as String: kSecClassKey,
                                       kSecAttrApplicationTag as String: tag,
                                       kSecValueData as String: zke_key_data,
@@ -127,4 +126,27 @@ class CryptoTools {
         print(set_status)
         return set_status == errSecSuccess;
     }
+    
+    func retrieveZKEKeyFromKeychain(user_id:Int)-> Data?{
+        let context = LAContext()
+            context.localizedReason = "Your vault decryption key is protected by your biometrics."
+
+        let tag = "com.zero-totp.zke_key.user.\(user_id)".data(using: .utf8)!
+        let query: [String:Any] = [kSecClass as String: kSecClassKey,
+                                      kSecAttrApplicationTag as String: tag,
+                                   kSecReturnData as String: true,
+                                   kSecUseAuthenticationContext as String: context,
+                                   kSecMatchLimit as String: kSecMatchLimitOne];
+        
+        var result: AnyObject?;
+        let status =  SecItemCopyMatching(query as CFDictionary, &result);
+        if status == errSecSuccess, let data = result as? Data {
+                return data
+            } else {
+                print("Keychain retrieval failed: \(status)")
+                return nil
+            }
+    }
+    
+   
 }

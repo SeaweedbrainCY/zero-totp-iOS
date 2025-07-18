@@ -1,22 +1,31 @@
 {
-  "originHash" : "1de993108dc2fcdd1e6d0a17bec1987154d86d1687dcce904da1b091ea47e0a1",
+  "originHash" : "e74a527e616ef47565ed0034c416813779eef372942e658d2c048f6c7aecfddf",
   "pins" : [
     {
-      "identity" : "autolayout",
+      "identity" : "swift-asn1",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/componentskit/AutoLayout",
+      "location" : "https://github.com/apple/swift-asn1.git",
       "state" : {
-        "revision" : "78e39facca2cc459a135655cae0e9feb5a587892",
-        "version" : "1.0.0"
+        "revision" : "f70225981241859eb4aa1a18a75531d26637c8cc",
+        "version" : "1.4.0"
       }
     },
     {
-      "identity" : "componentskit",
+      "identity" : "swift-crypto",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/componentskit/ComponentsKit",
+      "location" : "https://github.com/apple/swift-crypto.git",
       "state" : {
-        "revision" : "621676a6d270695c13ddd7970c68bf7afa7b80bd",
-        "version" : "1.5.3"
+        "revision" : "e8d6eba1fef23ae5b359c46b03f7d94be2f41fed",
+        "version" : "3.12.3"
+      }
+    },
+    {
+      "identity" : "swiftotp",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/lachlanbell/SwiftOTP.git",
+      "state" : {
+        "revision" : "9660551ea3df153c3cbacfa34ac3abbec73a8b84",
+        "version" : "3.0.2"
       }
     }
   ],

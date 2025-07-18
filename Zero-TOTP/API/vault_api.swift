@@ -34,6 +34,21 @@ class VaultAPI {
         var message: String;
     }
     
+    struct EncryptedSecret:Codable {
+        var uuid: String;
+        var enc_secret: String;
+    }
+    
+    
+    struct EncryptedVaultAPIResponse: Codable{
+        var enc_secrets: [EncryptedSecret];
+    }
+    
+    struct GetEncryptedVaultResult: Codable{
+        var status: Int;
+        var message: String;
+        var encrypted_secrets:[EncryptedSecret]?;
+    }
     
     
     init(){
@@ -51,7 +66,7 @@ class VaultAPI {
             var base_url = self.zero_totp_base_url
             base_url.path = "/api/v1/zke_encrypted_key"
             guard let final_url = base_url.url else { throw NetworkError.badUrl }
-            let (data, response) = try await URLSession.shared.data(from: final_url)
+            let (data, response) = try await NetworkManager().sendRequest(URLRequest(url: final_url))
             guard let response = response as? HTTPURLResponse else { throw NetworkError.badResponse }
             if (response.statusCode == 200){
                 guard let decoded_response = try? JSONDecoder().decode(ZKEEncryptedKeySpecResponse.self, from: data) else {
@@ -77,11 +92,53 @@ class VaultAPI {
             api_response.status = 0
         } catch NetworkError.failedToDecodeResponse {
             api_response.message = "Failed to read the response from API."
+            api_response.status = 0
         } catch {
             api_response.message = "An error occured decoding the data"
             api_response.status = 0
         }
         return api_response;
+        
+    }
+    
+    func get_encrypted_vault() async -> GetEncryptedVaultResult{
+        var result = GetEncryptedVaultResult(status: 0, message: "")
+        do {
+            var base_url = self.zero_totp_base_url
+            base_url.path = "/api/v1/all_secrets"
+            guard let final_url = base_url.url else { throw NetworkError.badUrl }
+            let (data, response) = try await NetworkManager().sendRequest(URLRequest(url: final_url))
+            guard let response = response as? HTTPURLResponse else { throw NetworkError.badResponse }
+            if (response.statusCode == 200){
+                guard let decoded_response = try? JSONDecoder().decode(EncryptedVaultAPIResponse.self, from: data) else {
+                    result.status = response.statusCode;
+                    throw NetworkError.failedToDecodeResponse
+                }
+                result.status = response.statusCode;
+                result.message = "OK";
+                result.encrypted_secrets = decoded_response.enc_secrets;
+            } else {
+                guard let decodedResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data) else { result.status = response.statusCode; throw NetworkError.failedToDecodeResponse }
+                result.status = response.statusCode
+                result.message = decodedResponse.message ?? decodedResponse.error ?? "Unknown error";
+            }
+        } catch NetworkError.badUrl {
+            result.message = "There was an error forging the request";
+            result.status = 0;
+        } catch NetworkError.badResponse {
+            result.message = "Impossible to chat with the server. Verify your connection and/or status.zero-totp.com";
+            result.status = 0
+        } catch NetworkError.badStatus {
+            result.message = "Did not get a 2xx status code from the response"
+            result.status = 0
+        } catch NetworkError.failedToDecodeResponse {
+            result.message = "Failed to read the response from API."
+            result.status = 0
+        } catch {
+            result.message = "An error occured decoding the data"
+            result.status = 0
+        }
+        return result;
         
     }
 }

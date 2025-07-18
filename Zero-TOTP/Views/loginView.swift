@@ -13,6 +13,7 @@ import UIKit
 
 
 struct LoginView: View {
+    @ObservedObject var vaultViewModel: VaultViewModel
     @State private var email: String = ""
     @State private var passphrase: String = ""
     @State private var toast: FancyToast? = nil
@@ -20,6 +21,14 @@ struct LoginView: View {
     @State private var zero_totp_url = URLComponents(string: UserDefaults.standard.string(forKey: "zero_totp_base_url") ?? "https://zero-totp.com") ?? URLComponents(string: "https://zero-totp.com")!
     @State private var customURL = ""
     @State private var isLoading = false
+    
+    
+    func onLoginAppear(){
+        let saved_email = UserDefaults.standard.value(forKey: "user_email")
+        if(saved_email != nil){
+            email = saved_email as! String;
+        }
+    }
 
     
     func loginflow(email:String, passphrase:String){
@@ -41,14 +50,17 @@ struct LoginView: View {
                         if let derivedKey = await crypto_tool.derivePassphrase(passphrase: passphrase, derivationKeySalt: login_flow.derivedKeySalt) {
                             let get_zke_flow: VaultAPI.ZKEEncryptedKeyFlowResult = await vault_api.get_zke_encrypted_key()
                                 if (get_zke_flow.status == 200){
-                                    let decrypted_zke_key = crypto_tool.decryptZKEKey(encryptedZKEKey: get_zke_flow.zke_encrypted_key!, derivedPassphraseData: derivedKey)
+                                    let decrypted_zke_key = crypto_tool.aes_decrypt(encrypted_cipher: get_zke_flow.zke_encrypted_key!, key_data: derivedKey)
                                     if (decrypted_zke_key != nil){
                                         let decrypted_zke_key_data = Data(base64Encoded: decrypted_zke_key!)
                                         if (decrypted_zke_key_data != nil){
-                                            if (crypto_tool.storeZKEKeyInKeychain(decrypted_zke_key_data!, account_id: login_flow.id)){
+                                            if (crypto_tool.storeZKEKeyInKeychain(decrypted_zke_key_data!, user_id: login_flow.id)){
                                                 await MainActor.run {
                                                     toast = FancyToast(type: .success , title: "Welcome back 🎉", message: "")
+                                                    
+                                                    UserDefaults.standard.set(email, forKey: "user_email")
                                                     isLoading = false
+                                                    vaultViewModel.login_successful()
                                                 }
                                             } else {
                                                 await MainActor.run {
@@ -98,9 +110,11 @@ struct LoginView: View {
     func setCustomURL(url:String){
         if(url.range(of: "((([A-Za-z]{3,9}:(?:\\/\\/)?)(?:[-;:&=\\+\\$,\\w]+@)?[A-Za-z0-9.-]+(:[0-9]+)?|(?:www.|[-;:&=\\+\\$,\\w]+@)[A-Za-z0-9.-]+)((?:\\/[\\+~%\\/.\\w\\-_]*)?\\??(?:[-\\+=&;%@.\\w_]*)#?(?:[\\w]*))?)",  options: .regularExpression, range: nil, locale: nil)) == nil {
             toast = FancyToast(type: .error, title: "Invalid URL", message: "Please provide a valid URL for your custom Zero-TOTP instance")
+            self.isLoading = false
         } else {
             guard let url_component = URLComponents(string: url) else {
                 toast = FancyToast(type: .error, title: "Invalid URL", message: "Please provide a valid URL for your custom Zero-TOTP instance")
+                self.isLoading = false
                 return
             }
             self.zero_totp_url = url_component
@@ -113,6 +127,7 @@ struct LoginView: View {
     func isEmailFormatCorrect(email:String)->Bool{
         if(email == "" || email.range(of: "\\S+@\\S+\\.\\S+", options: .regularExpression, range: nil, locale: nil) == nil){
             toast = FancyToast(type: .error, title: "Invalid email address", message: "Please provide a valid email address ")
+            self.isLoading = false
             return false
         } else {
             return true
@@ -122,6 +137,7 @@ struct LoginView: View {
     func isPassphraseFormatCorrect(passphrase:String)->Bool{
         if(passphrase == ""){
             toast = FancyToast(type: .error, title: "Empty passphrase", message: "Your passphrase cannot be empty")
+            self.isLoading = false
             return false
         } else {
             return true
@@ -218,7 +234,7 @@ struct LoginView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity).ignoresSafeArea(.keyboard)
         }
         .toastView(toast: $toast)
-        .gesture(DragGesture().onChanged{_ in UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)})
+        .gesture(DragGesture().onChanged{_ in UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)}).onAppear(perform: onLoginAppear)
     }
     
     
@@ -227,6 +243,6 @@ struct LoginView: View {
 
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
-        LoginView()
+        LoginView(vaultViewModel: VaultViewModel())
     }
 }

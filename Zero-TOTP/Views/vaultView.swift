@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import ComponentsKit
+import SwiftOTP
 
 
 
@@ -17,19 +17,20 @@ enum TOTPBoxColor {
         switch self {
         case .red:
             return LinearGradient(
-                colors: [Color.red.opacity(0.7), Color.red.opacity(0.9)],
+                
+                colors: [Color("danger").opacity(0.9), Color("danger").opacity(0.8)],
                 startPoint: .topLeading, endPoint: .bottomTrailing)
         case .blue:
             return LinearGradient(
-                colors: [Color.blue.opacity(0.6), Color.blue.opacity(0.8)],
+                colors: [Color("info").opacity(0.9), Color("info").opacity(0.8)],
                 startPoint: .topLeading, endPoint: .bottomTrailing)
         case .green:
             return LinearGradient(
-                colors: [Color.green.opacity(0.6), Color.green.opacity(0.8)],
+                colors: [Color("success").opacity(0.9), Color("success").opacity(0.8)],
                 startPoint: .topLeading, endPoint: .bottomTrailing)
         case .yellow:
             return LinearGradient(
-                colors: [Color.yellow.opacity(0.6), Color.orange.opacity(0.8)],
+                colors: [Color("warning").opacity(0.9), Color("warning").opacity(0.8)],
                 startPoint: .topLeading, endPoint: .bottomTrailing)
         }
     }
@@ -74,9 +75,10 @@ struct TOTPBoxView: View {
 
         }
         .padding()
-        .background(color.gradient)
+        .background(color.gradient
+        )
         .cornerRadius(20)
-        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 6)
+        .shadow(color: Color.black.opacity(0.5), radius: 10, x: 0, y: 6)
         .padding(.horizontal)
         .padding(.top, 20)
     }
@@ -84,79 +86,78 @@ struct TOTPBoxView: View {
 
 struct VaultView: View {
     @State private var searchText = "";
+    @StateObject private var viewModel = VaultViewModel()
+    
+    
+    
+    
     var body: some View {
-        
-        
         NavigationStack {
             ZStack {
-                Color("dark").ignoresSafeArea()
-                ScrollView(.vertical) {
-                    VStack {
-                        Image("logo_zero_totp_light")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(maxWidth: 100)
-                            .padding(.top, 20)
-                            .padding(.horizontal, 40)
-                        
-                        Spacer()
-                        Text("Your TOTP vault").font(.largeTitle).bold().foregroundStyle(.white).padding(.trailing, 30).padding(.leading, 30).multilineTextAlignment(.center)
-                        Text("You and only you can access to this data. All the magic is done on your iPhone.").font(.subheadline ).bold().foregroundStyle(.gray)
-                            .padding(.trailing, 30).padding(.leading, 30).multilineTextAlignment(.center).padding(.bottom, 30)
+                
+                Color("dark")
+                        .ignoresSafeArea()
+
+                    Circle()
+                        .fill(Color.blue.opacity(0.3))
+                        .frame(width: 300, height: 300)
+                        .offset(x: -100, y: -200)
+                        .blur(radius: 100)
+
+                    Circle()
+                        .fill(Color.purple.opacity(0.3))
+                        .frame(width: 250, height: 250)
+                        .offset(x: 150, y: 250)
+                        .blur(radius: 100)
+
+                VStack{
+                VStack {
+                    Image("logo_zero_totp_light")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: 100)
+                        .padding(.top, 20)
+                        .padding(.horizontal, 40)
+                    Text("Your TOTP vault").font(.largeTitle).bold().foregroundStyle(.white).padding(.trailing, 30).padding(.leading, 30).multilineTextAlignment(.center)
+                    Text("You and only you can access to this data. All the magic is done on your iPhone.").font(.subheadline ).bold().foregroundStyle(.gray)
+                        .padding(.trailing, 30).padding(.leading, 30).multilineTextAlignment(.center).padding(.bottom, 30)
                     
-                        HStack{
-                            Text(Image(systemName: "magnifyingglass")).foregroundStyle(.white)
-                            TextField("Search", text:$searchText )
-                                  .autocapitalization(.none)
-                                .preferredColorScheme(.dark)
-                                .foregroundColor(.white)
-                                .bold().onAppear { UITextField.appearance().clearButtonMode = .whileEditing }
-                        }.padding(.horizontal, 30).padding(.bottom, 20)
+                    HStack{
+                        Text(Image(systemName: "magnifyingglass")).foregroundStyle(.white)
+                        TextField("Search", text:$searchText )
+                            .autocapitalization(.none)
+                            .preferredColorScheme(.dark)
+                            .foregroundColor(.white)
+                            .bold().onAppear { UITextField.appearance().clearButtonMode = .whileEditing }
+                    }.padding(.horizontal, 30).padding(.bottom, 20)
+                }.sheet(isPresented: $viewModel.show_login_page ) {
+                    print("login view dismissed")
+                } content: {
+                    LoginView(vaultViewModel: viewModel)
+                }
+                    VStack{
                         
-                        VStack(spacing: 20) {
+                        ScrollView(.vertical) {
+                            ForEach(viewModel.vault){  entry in
+                                VStack(spacing: 20) {
                                     TOTPBoxView(
-                                        website: "github.com",
-                                        code: "123 456",
-                                        color: .blue,
-                                        onEdit: { print("Edit tapped") },
+                                        website: entry.name,
+                                        code: "\(entry.totp_code ?? "Error")" ,
+                                        color: entry.color,
+                                        onEdit: { viewModel.increment() },
                                         onCopy: { print("Copy tapped") }
                                     )
                                 }
-                        VStack(spacing: 20) {
-                                    TOTPBoxView(
-                                        website: "amazon.com",
-                                        code: "123 456",
-                                        color: .green,
-                                        onEdit: { print("Edit tapped") },
-                                        onCopy: { print("Copy tapped") }
-                                    )
-                                }
-                        VStack(spacing: 20) {
-                                    TOTPBoxView(
-                                        website: "apple.com",
-                                        code: "123 456",
-                                        color: .red,
-                                        onEdit: { print("Edit tapped") },
-                                        onCopy: { print("Copy tapped") }
-                                    )
-                                }
-                        VStack(spacing: 20) {
-                                    TOTPBoxView(
-                                        website: "microsoft.com",
-                                        code: "123 456",
-                                        color: .yellow,
-                                        onEdit: { print("Edit tapped") },
-                                        onCopy: { print("Copy tapped") }
-                                    )
-                                }
-                        
+                            }
+                        }
                     }
                 }
-            }
+            }.onAppear(perform: viewModel.onVaultAppear).toastView(toast: $viewModel.toast)
         }
         
     }
 }
+
 
 
 struct VaultView_Previews: PreviewProvider {

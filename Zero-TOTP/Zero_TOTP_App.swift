@@ -11,8 +11,9 @@ import Foundation
 @main
 struct ZeroTOTPApp: App {
     var body: some Scene {
+        let vaultViewModel = VaultViewModel()
         WindowGroup {
-            GeneralTabView()
+            GeneralTabView().environmentObject(vaultViewModel)
         }
     }
 }

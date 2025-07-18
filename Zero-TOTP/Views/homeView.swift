@@ -27,7 +27,7 @@ struct HomeView: View {
                     
                     
                     NavigationLink{
-                        LoginView()
+                        LoginView(vaultViewModel: VaultViewModel())
                     } label:{
                         Text("Login")
                             .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
