@@ -80,7 +80,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "93"
             endingLineNumber = "93"
-            landmarkName = "decryptZKEKey(encryptedZKEKey:derivedPassphraseData:)"
+            landmarkName = "aes_decrypt(encrypted_cipher:key_data:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -96,7 +96,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "94"
             endingLineNumber = "94"
-            landmarkName = "decryptZKEKey(encryptedZKEKey:derivedPassphraseData:)"
+            landmarkName = "aes_decrypt(encrypted_cipher:key_data:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

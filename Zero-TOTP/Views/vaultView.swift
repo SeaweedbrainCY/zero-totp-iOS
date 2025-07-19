@@ -84,6 +84,25 @@ struct TOTPBoxView: View {
     }
 }
 
+
+
+struct TOTPBoxWrapper: View {
+    @ObservedObject var entry: TOTPEntry
+
+        var body: some View {
+            
+            VStack(spacing: 20) {
+                TOTPBoxView(
+                    website: entry.name,
+                    code: "\(entry.totp_code ?? "Error")" ,
+                    color: entry.color,
+                    onEdit: { print("edit tapped")},
+                    onCopy: { print("Copy tapped") }
+                )
+            }
+    }
+}
+
 struct VaultView: View {
     @State private var searchText = "";
     @StateObject private var viewModel = VaultViewModel()
@@ -130,6 +149,8 @@ struct VaultView: View {
                             .foregroundColor(.white)
                             .bold().onAppear { UITextField.appearance().clearButtonMode = .whileEditing }
                     }.padding(.horizontal, 30).padding(.bottom, 20)
+                    
+                    ProgressView(value: viewModel.totp_seconds_remaining, total:30).padding(.horizontal).foregroundStyle(.white)
                 }.sheet(isPresented: $viewModel.show_login_page ) {
                     print("login view dismissed")
                 } content: {
@@ -139,15 +160,8 @@ struct VaultView: View {
                         
                         ScrollView(.vertical) {
                             ForEach(viewModel.vault){  entry in
-                                VStack(spacing: 20) {
-                                    TOTPBoxView(
-                                        website: entry.name,
-                                        code: "\(entry.totp_code ?? "Error")" ,
-                                        color: entry.color,
-                                        onEdit: { viewModel.increment() },
-                                        onCopy: { print("Copy tapped") }
-                                    )
-                                }
+                                TOTPBoxWrapper(entry: entry)
+                                
                             }
                         }
                     }

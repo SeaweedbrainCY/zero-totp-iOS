@@ -8,8 +8,10 @@
 import Foundation
 import CryptoKit
 import SwiftOTP
+import Combine
 
-struct TOTPEntry: Identifiable {
+
+class TOTPEntry: ObservableObject, Identifiable {
     let id = UUID()
     let item_id: String
     let name: String
@@ -19,7 +21,37 @@ struct TOTPEntry: Identifiable {
     let uri: String
     let tags: [String]
     let domain: String?
-    let totp_code: String?
+    var totp:TOTP? = nil
+
+    @Published var totp_code: String?
+
+    init(name: String, color: TOTPBoxColor,  item_id: String, secret: String, favicon: Bool, uri: String, tags: [String], domain: String?) {
+        self.item_id = item_id
+        self.secret = secret
+        self.favicon = favicon
+        self.uri = uri
+        self.tags = tags
+        self.domain = domain
+        self.name = name
+        self.color = color
+        
+        let secret_data = base32DecodeToData(self.secret)
+        if (secret_data != nil){
+            self.totp = SwiftOTP.TOTP(secret: secret_data!)
+            self.totp_code = self.totp?.generate(time: Date())
+            if (self.totp == nil){
+                print("Invalid TOTP secret")
+            }
+        } else {
+            print("Secret is not a valid base32 encoded string.");
+        }
+        
+        
+    }
+
+    func regenerateCode() {
+        self.totp_code = totp?.generate(time: Date())
+    }
 }
 
 struct DecryptedSecret:Codable {
@@ -39,10 +71,10 @@ class VaultViewModel:ObservableObject {
     @Published var show_login_page = false;
     @Published var vault: [TOTPEntry] = [];
     @Published var toast: FancyToast?;
-    func increment(){
-        count += 1;
-        show_login_page = true;
-    }
+    @Published var totp_seconds_remaining:Double = 0;
+    
+    private var timer: AnyCancellable?
+
     
     func onVaultAppear(){
        
@@ -77,19 +109,8 @@ class VaultViewModel:ObservableObject {
                                     }
                                     
                                     let display_favicon = decoded_secret.favicon == "true"
-                                    let secret_data = base32DecodeToData(decoded_secret.secret)
-                                    var totp:TOTP?;
-                                    if (secret_data != nil){
-                                        totp = SwiftOTP.TOTP(secret: secret_data!)
-                                        if (totp == nil){
-                                            print("Invalid TOTP secret")
-                                            decryption_failed = true;
-                                        }
-                                    } else {
-                                        print("Secret is not a valid base32 encoded string.");
-                                        decryption_failed = true;
-                                    }
-                                    decrypted_vault.append(TOTPEntry(item_id: enc_secret.uuid , name: decoded_secret.name, secret: decoded_secret.secret, color: color, favicon: display_favicon, uri: decoded_secret.uri, tags: [decoded_secret.tags], domain: decoded_secret.domain, totp_code: totp?.generate(time: Date())))
+                                    
+                                    decrypted_vault.append(TOTPEntry(name: decoded_secret.name,  color: color, item_id: enc_secret.uuid , secret: decoded_secret.secret, favicon: display_favicon, uri: decoded_secret.uri, tags: [decoded_secret.tags], domain: decoded_secret.domain))
                                     print("Secret for \(decoded_secret.name) added")
                                 } catch{
                                    print("Failed to decode secret. \(error)");
@@ -129,7 +150,31 @@ class VaultViewModel:ObservableObject {
                 }
             }
         }
-        
+        self.startTimer()
+    }
+    
+    private func startTimer() {
+        timer = Timer.publish(every: 1, on: .main, in: .common) 
+                .autoconnect()
+                .sink { [weak self] _ in
+                    self?.checkAndUpdateTOTP()
+        }
+    }
+    
+    private func checkAndUpdateTOTP() {
+        let now = Date().timeIntervalSince1970
+        self.totp_seconds_remaining = 30 - now.truncatingRemainder(dividingBy: 30)
+        print(self.totp_seconds_remaining)
+        if(Int(self.totp_seconds_remaining) >= 29){
+            self.regenerate_all_totp_codes()
+        }
+    }
+    
+    private func regenerate_all_totp_codes(){
+        for entry in vault {
+                    entry.regenerateCode() 
+                }
+        print("all totp code re generated")
     }
     
     func who_am_i() async ->Int?{
