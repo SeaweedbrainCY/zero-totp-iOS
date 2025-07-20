@@ -9,6 +9,7 @@ import Foundation
 import CryptoKit
 import SwiftOTP
 import Combine
+import SwiftUI
 
 
 class TOTPEntry: ObservableObject, Identifiable {
@@ -50,7 +51,9 @@ class TOTPEntry: ObservableObject, Identifiable {
     }
 
     func regenerateCode() {
-        self.totp_code = totp?.generate(time: Date())
+        DispatchQueue.main.async {
+            self.totp_code = self.totp?.generate(time: Date())
+        }
     }
 }
 
@@ -71,9 +74,13 @@ class VaultViewModel:ObservableObject {
     @Published var show_login_page = false;
     @Published var vault: [TOTPEntry] = [];
     @Published var toast: FancyToast?;
-    @Published var totp_seconds_remaining:Double = 0;
-    
-    private var timer: AnyCancellable?
+    @Published var totp_seconds_remaining:Double = 30.0;
+    @Published var progress:Double = 1.0;
+    let totp_default_interval:Double = 30.0;
+    private var backgroundQueue = DispatchQueue(label: "totp.timer", qos: .utility)
+    var next_generate_datetime:Date? = nil;
+    private var timer: Timer?
+    public let refresh_interval_s = 0.1;
 
     
     func onVaultAppear(){
@@ -154,21 +161,36 @@ class VaultViewModel:ObservableObject {
     }
     
     private func startTimer() {
-        timer = Timer.publish(every: 1, on: .main, in: .common) 
-                .autoconnect()
-                .sink { [weak self] _ in
-                    self?.checkAndUpdateTOTP()
+        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+            self?.backgroundQueue.async {
+                self?.checkAndUpdateTOTP()
+            }
         }
+        RunLoop.current.add(timer!, forMode: .common)
     }
+     
+     private func checkAndUpdateTOTP() {
+         let now = Date().timeIntervalSince1970
+         let totp_seconds_remaining = self.totp_default_interval - now.truncatingRemainder(dividingBy: self.totp_default_interval)
+         DispatchQueue.main.async {
+             self.totp_seconds_remaining = totp_seconds_remaining
+             self.progress = self.totp_seconds_remaining/30
+         }
+         
+         if(self.next_generate_datetime == nil){
+             self.next_generate_datetime = Date(timeIntervalSince1970: (floor(now/self.totp_default_interval)+1)*self.totp_default_interval)
+             print("init next_generate_datetime = \(next_generate_datetime)")
+         }
+         
+         if(self.next_generate_datetime!.timeIntervalSince1970 < Date().timeIntervalSince1970){
+             self.next_generate_datetime = Date(timeIntervalSince1970: (floor(now/self.totp_default_interval)+1)*self.totp_default_interval)
+             print("new next_generate_datetime = \(next_generate_datetime)")
+             self.regenerate_all_totp_codes()
+         }
+         
+     }
     
-    private func checkAndUpdateTOTP() {
-        let now = Date().timeIntervalSince1970
-        self.totp_seconds_remaining = 30 - now.truncatingRemainder(dividingBy: 30)
-        print(self.totp_seconds_remaining)
-        if(Int(self.totp_seconds_remaining) >= 29){
-            self.regenerate_all_totp_codes()
-        }
-    }
+    
     
     private func regenerate_all_totp_codes(){
         for entry in vault {

@@ -42,6 +42,7 @@ struct TOTPBoxView: View {
     let color: TOTPBoxColor
     let onEdit: () -> Void
     let onCopy: () -> Void
+    @State private var animate = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -72,6 +73,9 @@ struct TOTPBoxView: View {
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.vertical, 16)
+                .scaleEffect(animate ? 1.05 : 1.0)
+                .opacity(animate ? 0.0 : 1.0)
+                .animation(.easeInOut(duration: 0.25), value: animate)
 
         }
         .padding()
@@ -81,6 +85,12 @@ struct TOTPBoxView: View {
         .shadow(color: Color.black.opacity(0.5), radius: 10, x: 0, y: 6)
         .padding(.horizontal)
         .padding(.top, 20)
+        .onChange(of: code) {
+                    animate = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                        animate = false
+                    }
+                }
     }
 }
 
@@ -106,8 +116,6 @@ struct TOTPBoxWrapper: View {
 struct VaultView: View {
     @State private var searchText = "";
     @StateObject private var viewModel = VaultViewModel()
-    
-    
     
     
     var body: some View {
@@ -150,7 +158,10 @@ struct VaultView: View {
                             .bold().onAppear { UITextField.appearance().clearButtonMode = .whileEditing }
                     }.padding(.horizontal, 30).padding(.bottom, 20)
                     
-                    ProgressView(value: viewModel.totp_seconds_remaining, total:30).padding(.horizontal).foregroundStyle(.white)
+                    ProgressView(value: viewModel.progress)
+                        .padding(.horizontal)
+                        .progressViewStyle(LinearProgressViewStyle(tint: .white))
+                        .animation(.linear(duration: 0.1), value:viewModel.progress)
                 }.sheet(isPresented: $viewModel.show_login_page ) {
                     print("login view dismissed")
                 } content: {
