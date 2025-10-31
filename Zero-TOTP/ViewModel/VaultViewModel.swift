@@ -175,6 +175,7 @@ class VaultViewModel:ObservableObject {
 
     
     func onVaultAppear(){
+        self.startTimer()
         print("Vault appeared. Vault state : \(self.vault_state)")
         /* Flow :
             If vault not init :
@@ -255,7 +256,6 @@ class VaultViewModel:ObservableObject {
        
         Task {
             let user_id:Int? = await self.who_am_i();
-            let crypto_tools = CryptoTools()
             let keychain = KeychainStorage()
             
             if (user_id != nil){
@@ -308,7 +308,6 @@ class VaultViewModel:ObservableObject {
                 }
             }
         }
-        self.startTimer()
     }
     
     
