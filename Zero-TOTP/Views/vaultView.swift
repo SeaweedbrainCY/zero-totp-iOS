@@ -41,8 +41,9 @@ struct TOTPBoxView: View {
     let code: String
     let color: TOTPBoxColor
     let onEdit: () -> Void
-    let onCopy: () -> Void
     @State private var animate = false
+    @ObservedObject var viewModel: VaultViewModel
+    
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -60,7 +61,7 @@ struct TOTPBoxView: View {
                         .foregroundColor(.white)
                 }.padding(.trailing, 10)
 
-                Button(action: onCopy) {
+                Button(action:{viewModel.copy_totp_code(code)} ) {
                     Image(systemName: "document.on.clipboard.fill")
                         .foregroundColor(.white)
                 }
@@ -91,6 +92,7 @@ struct TOTPBoxView: View {
                         animate = false
                     }
                 }
+        .onTapGesture {viewModel.copy_totp_code(code)}
     }
 }
 
@@ -98,6 +100,7 @@ struct TOTPBoxView: View {
 
 struct TOTPBoxWrapper: View {
     @ObservedObject var entry: TOTPEntry
+    @ObservedObject var viewModel: VaultViewModel
 
         var body: some View {
             
@@ -107,7 +110,7 @@ struct TOTPBoxWrapper: View {
                     code: "\(entry.totp_code ?? "Error")" ,
                     color: entry.color,
                     onEdit: { print("edit tapped")},
-                    onCopy: { print("Copy tapped") }
+                    viewModel: viewModel
                 )
             }
     }
@@ -171,7 +174,7 @@ struct VaultView: View {
                         
                         ScrollView(.vertical) {
                             ForEach(viewModel.vault){  entry in
-                                TOTPBoxWrapper(entry: entry)
+                                TOTPBoxWrapper(entry: entry, viewModel: viewModel)
                             }
                         }
                     }

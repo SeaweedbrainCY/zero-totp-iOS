@@ -172,6 +172,14 @@ class VaultViewModel:ObservableObject {
     var next_generate_datetime:Date? = nil;
     private var timer: Timer?
     public let refresh_interval_s = 0.1;
+    
+    
+    private func update_toast(type: FancyToastStyle , title: String, message: String){
+        if (toast != nil) {
+            toast = nil
+        }
+        toast = FancyToast(type: type, title: title, message: message)
+    }
 
     
     func onVaultAppear(){
@@ -358,12 +366,31 @@ class VaultViewModel:ObservableObject {
     }
     
     private func startTimer() {
-        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             self?.backgroundQueue.async {
                 self?.checkAndUpdateTOTP()
             }
         }
         RunLoop.current.add(timer!, forMode: .common)
+        scheduleNextGeneration()
+    }
+    
+    private func update_progress(){
+        let now = Date().timeIntervalSince1970
+        let remaining = self.totp_default_interval - now.truncatingRemainder(dividingBy: self.totp_default_interval)
+        self.progress = remaining / 30
+        self.totp_seconds_remaining = remaining
+    }
+    
+    private func scheduleNextGeneration() {
+        let now = Date().timeIntervalSince1970
+        let nextInterval = (floor(now / self.totp_default_interval) + 1) * self.totp_default_interval
+        let delay = nextInterval - now
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            self?.regenerate_all_totp_codes()
+            self?.scheduleNextGeneration() // Planifier le prochain
+        }
     }
      
      private func checkAndUpdateTOTP() {
@@ -411,6 +438,13 @@ class VaultViewModel:ObservableObject {
     
     func login_successful(){
         self.show_login_page = false
+    }
+    
+    func copy_totp_code(_ code: String){
+        let impactMed = UIImpactFeedbackGenerator(style: .medium)
+        impactMed.impactOccurred()
+        UIPasteboard.general.string = code
+        update_toast(type: .success, title: "Copied !", message: "")
     }
 }
 
