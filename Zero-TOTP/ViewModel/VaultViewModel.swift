@@ -31,6 +31,7 @@ class TOTPEntry: ObservableObject, Identifiable, Codable {
     let tags: [String]?
     let domain: String?
     var totp: TOTP? = nil
+    var isHidden: Bool = false
 
     @Published var totp_code: String?
 
@@ -446,5 +447,20 @@ class VaultViewModel:ObservableObject {
         UIPasteboard.general.string = code
         update_toast(type: .success, title: "Copied !", message: "")
     }
+    
+    /*public func filterTOTPCodes(_ filter:String){
+        print("filtering on \(filter)")
+        if filter == ""{
+            for entry in vault {
+                entry.isHidden = false
+            }
+        }
+        for entry in vault {
+            if(){
+                entry.isHidden = true
+                print("\(entry.name) is now hidden")
+            }
+        }
+    }*/
 }
 

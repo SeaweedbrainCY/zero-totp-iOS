@@ -174,7 +174,9 @@ struct VaultView: View {
                         
                         ScrollView(.vertical) {
                             ForEach(viewModel.vault){  entry in
-                                TOTPBoxWrapper(entry: entry, viewModel: viewModel)
+                                if (searchText == "" || (entry.name.lowercased().contains(searchText.lowercased()) || (entry.domain?.lowercased().contains(searchText.lowercased()) ?? false))) {
+                                    TOTPBoxWrapper(entry: entry, viewModel: viewModel)
+                                }
                             }
                         }
                     }
