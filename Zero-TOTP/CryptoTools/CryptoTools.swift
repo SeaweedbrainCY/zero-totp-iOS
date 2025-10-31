@@ -11,6 +11,9 @@ import CommonCrypto
 import LocalAuthentication
 import Security
 
+
+
+
 class CryptoTools {
     
     var pbkdf2_iterations = 700000;
@@ -100,53 +103,5 @@ class CryptoTools {
             return nil;
         }
     }
-    
-    
-    func storeZKEKeyInKeychain(_ zke_key_data: Data, user_id:Int)-> Bool{
-        guard let accessControl = SecAccessControlCreateWithFlags(nil,
-                                                                      kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
-                                                                      .biometryCurrentSet,
-                                                                      nil) else {
-                print("Failed to create access control")
-                return false
-            }
-        let tag = "com.zero-totp.zke_key.user.\(user_id)".data(using: .utf8)!
-        let query: [String:Any] = [kSecClass as String: kSecClassKey,
-                                      kSecAttrApplicationTag as String: tag,
-                                      kSecValueData as String: zke_key_data,
-                                      kSecAttrAccessControl as String: accessControl];
-        
-
-        SecItemDelete(query as CFDictionary);
-
-        
-        // Store the key
-        
-        let set_status = SecItemAdd(query as CFDictionary, nil);
-        print(set_status)
-        return set_status == errSecSuccess;
-    }
-    
-    func retrieveZKEKeyFromKeychain(user_id:Int)-> Data?{
-        let context = LAContext()
-            context.localizedReason = "Your vault decryption key is protected by your biometrics."
-
-        let tag = "com.zero-totp.zke_key.user.\(user_id)".data(using: .utf8)!
-        let query: [String:Any] = [kSecClass as String: kSecClassKey,
-                                      kSecAttrApplicationTag as String: tag,
-                                   kSecReturnData as String: true,
-                                   kSecUseAuthenticationContext as String: context,
-                                   kSecMatchLimit as String: kSecMatchLimitOne];
-        
-        var result: AnyObject?;
-        let status =  SecItemCopyMatching(query as CFDictionary, &result);
-        if status == errSecSuccess, let data = result as? Data {
-                return data
-            } else {
-                print("Keychain retrieval failed: \(status)")
-                return nil
-            }
-    }
-    
    
 }

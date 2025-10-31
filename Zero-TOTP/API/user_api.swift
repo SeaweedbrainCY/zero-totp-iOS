@@ -15,7 +15,7 @@ class UserAPI {
     
     init(){
         let defaults = UserDefaults.standard
-        if let baseUrlString = defaults.string(forKey: "zero_totp_base_url") {
+        if let baseUrlString = defaults.string(forKey: TenantDefaultsKeys.base_url) {
             zero_totp_base_url = URLComponents(string: baseUrlString) ?? URLComponents(string: "https://zero-totp.com")!
         }
     }
@@ -141,7 +141,7 @@ class UserAPI {
                     api_response.message = decodedResponse.message ?? decodedResponse.error ?? "Unknown error"
                     return api_response
             }
-            guard let decodedResponse = try? JSONDecoder().decode(LoginSpecResponse.self, from: data) else {api_response.status = response.statusCode;  throw NetworkError.failedToDecodeResponse }
+            guard let decodedResponse = try? JSONDecoder().decode(LoginSpecResponse.self, from: data) else {api_response.status = 0 ;  throw NetworkError.failedToDecodeResponse }
                 api_response.status = response.statusCode
                 api_response.message = decodedResponse.passphrase_salt ?? decodedResponse.message ?? ""
             
@@ -179,8 +179,7 @@ class UserAPI {
                     api_response.message = decodedResponse.message ?? decodedResponse.error ?? "Unknown error"
                     return api_response
             }
-            guard let decodedResponse = try? JSONDecoder().decode(WhoAmIResult.self, from: data) else {api_response.status = response.statusCode;  throw NetworkError.failedToDecodeResponse }
-            print(decodedResponse)
+            guard let decodedResponse = try? JSONDecoder().decode(WhoAmIResult.self, from: data) else {api_response.status = 0;  throw NetworkError.failedToDecodeResponse }
             api_response.status = response.statusCode
             api_response.message = "OK"
             api_response.id = decodedResponse.id

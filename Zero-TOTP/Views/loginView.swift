@@ -18,13 +18,13 @@ struct LoginView: View {
     @State private var passphrase: String = ""
     @State private var toast: FancyToast? = nil
     @State private var showingCustomURLAlert = false
-    @State private var zero_totp_url = URLComponents(string: UserDefaults.standard.string(forKey: "zero_totp_base_url") ?? "https://zero-totp.com") ?? URLComponents(string: "https://zero-totp.com")!
+    @State private var zero_totp_url = URLComponents(string: UserDefaults.standard.string(forKey: TenantDefaultsKeys.base_url) ?? "https://zero-totp.com") ?? URLComponents(string: "https://zero-totp.com")!
     @State private var customURL = ""
     @State private var isLoading = false
     
     
     func onLoginAppear(){
-        let saved_email = UserDefaults.standard.value(forKey: "user_email")
+        let saved_email = UserDefaults.standard.value(forKey: UserDefaultsKeys.email)
         if(saved_email != nil){
             email = saved_email as! String;
         }
@@ -44,6 +44,7 @@ struct LoginView: View {
                 if (specs.status == 200){
                     let salt = specs.message
                     let crypto_tool = CryptoTools()
+                    let keychain = KeychainStorage()
                     let hashed_passphrase = await crypto_tool.hashPassphrase(passphrase: passphrase, salt: salt)
                     let login_flow = await user_api.authenticationFlow(username: email, passphrase: hashed_passphrase ?? "")
                     if (login_flow.status == 200){
@@ -54,11 +55,11 @@ struct LoginView: View {
                                     if (decrypted_zke_key != nil){
                                         let decrypted_zke_key_data = Data(base64Encoded: decrypted_zke_key!)
                                         if (decrypted_zke_key_data != nil){
-                                            if (crypto_tool.storeZKEKeyInKeychain(decrypted_zke_key_data!, user_id: login_flow.id)){
+                                            if (keychain.storeZKEKeyInKeychain(decrypted_zke_key_data!, user_id: login_flow.id)){
                                                 await MainActor.run {
                                                     toast = FancyToast(type: .success , title: "Welcome back 🎉", message: "")
                                                     
-                                                    UserDefaults.standard.set(email, forKey: "user_email")
+                                                    UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
                                                     isLoading = false
                                                     vaultViewModel.login_successful()
                                                 }
@@ -119,7 +120,7 @@ struct LoginView: View {
             }
             self.zero_totp_url = url_component
             let defaults = UserDefaults.standard
-            defaults.set(url, forKey: "zero_totp_base_url")
+            defaults.set(url, forKey: TenantDefaultsKeys.base_url)
         }
         
     }

@@ -53,7 +53,7 @@ class VaultAPI {
     
     init(){
         let defaults = UserDefaults.standard
-        if let baseUrlString = defaults.string(forKey: "zero_totp_base_url") {
+        if let baseUrlString = defaults.string(forKey: TenantDefaultsKeys.base_url) {
             zero_totp_base_url = URLComponents(string: baseUrlString) ?? URLComponents(string: "https://zero-totp.com")!
         }
     }

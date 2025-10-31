@@ -163,6 +163,7 @@ struct VaultView: View {
                         .progressViewStyle(LinearProgressViewStyle(tint: .white))
                         .animation(.linear(duration: 0.1), value:viewModel.progress)
                 }.sheet(isPresented: $viewModel.show_login_page ) {
+                    viewModel.onVaultAppear()
                     print("login view dismissed")
                 } content: {
                     LoginView(vaultViewModel: viewModel)
@@ -172,7 +173,6 @@ struct VaultView: View {
                         ScrollView(.vertical) {
                             ForEach(viewModel.vault){  entry in
                                 TOTPBoxWrapper(entry: entry)
-                                
                             }
                         }
                     }
