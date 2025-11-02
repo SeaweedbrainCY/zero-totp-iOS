@@ -16,7 +16,7 @@ struct GeneralTabView: View {
                         VaultView()
                     }
                     Tab("Settings", systemImage: "gear") {
-                        HomeView()
+                        SettingsView()
                     }
                 }.tabViewStyle(.sidebarAdaptable)
     }

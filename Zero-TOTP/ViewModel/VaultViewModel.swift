@@ -28,6 +28,7 @@ class TOTPEntry: ObservableObject, Identifiable, Codable {
     let color: TOTPBoxColor
     let favicon: Bool
     let uri: String
+    var favicon_url: String = ""
     let tags: [String]?
     let domain: String?
     var totp: TOTP? = nil
@@ -45,6 +46,9 @@ class TOTPEntry: ObservableObject, Identifiable, Codable {
         self.color = color
         self.tags = tags
         self.domain = domain
+        self.favicon_url = self.getIconURL(for: domain ?? "")
+        
+        print("favicon url \(favicon_url)")
         
         let secret_data = base32DecodeToData(self.secret)
         if let secret_data {
@@ -69,6 +73,19 @@ class TOTPEntry: ObservableObject, Identifiable, Codable {
         case tags
         case domain
     }
+    
+
+    
+    private func getIconURL(for websiteDomain: String) -> String {
+        if (websiteDomain.lowercased().wholeMatch(of: /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/) != nil) {
+            return "https://icons.duckduckgo.com/ip3/\(websiteDomain.lowercased()).ico"
+        }
+        print("\(websiteDomain) didn't math the regex")
+        return ""
+        
+    }
+    
+    
 
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)

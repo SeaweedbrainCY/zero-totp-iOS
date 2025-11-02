@@ -36,10 +36,45 @@ enum TOTPBoxColor {
     }
 }
 
+struct CircularProgressView: View {
+    let progress: Double
+    let color: Color
+    let size: CGFloat
+    
+    var lineWidth: CGFloat {
+            size * 0.15 // Proportional line width
+        }
+        
+    
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(
+                    color.opacity(0.5),
+                    lineWidth: lineWidth
+                )
+            Circle()
+                .trim(from: 0, to: progress)
+                .stroke(
+                    color ,
+                    style: StrokeStyle(
+                        lineWidth: lineWidth,
+                        lineCap: .round
+                    )
+                )
+                .rotationEffect(.degrees(-90))
+                // 1
+                .animation(.easeOut, value: progress)
+
+        }.frame(width: size, height: size)
+    }
+}
+
 struct TOTPBoxView: View {
     let website: String
     let code: String
     let color: TOTPBoxColor
+    let icon_url: String
     let onEdit: () -> Void
     @State private var animate = false
     @ObservedObject var viewModel: VaultViewModel
@@ -49,35 +84,61 @@ struct TOTPBoxView: View {
         VStack(alignment: .leading, spacing: 12) {
             // Header
             HStack {
+                AsyncImage(url: URL(string: icon_url)) { phase in
+                    switch phase {
+                    case .empty:
+                        Circle()
+                            .fill(Color.gray.opacity(0.3))
+                            .frame(width: 20, height: 20)
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 20, height: 20)
+                            .clipShape(Circle())
+                    case .failure:
+                        Circle()
+                            .fill(Color.gray.opacity(0.3))
+                            .frame(width: 20, height: 20)
+                    @unknown default:
+                        EmptyView()
+                    }
+                    
+                }
                 Text(website)
                     .font(.headline)
-                    .bold()
                     .foregroundColor(.white)
 
                 Spacer()
 
                 Button(action: onEdit) {
-                    Image(systemName: "pencil.circle.fill")
+                    Image(systemName: "pencil.circle")
+                        .font(.title3 )
                         .foregroundColor(.white)
                 }.padding(.trailing, 10)
 
                 Button(action:{viewModel.copy_totp_code(code)} ) {
-                    Image(systemName: "document.on.clipboard.fill")
+                    Image(systemName: "document.on.clipboard")
+                        .font(.title3)
                         .foregroundColor(.white)
                 }
             }
             Divider()
 
-            // TOTP Code
-            Text(code)
-                .font(.system(size: 36, weight: .bold, design: .monospaced))
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.vertical, 16)
-                .scaleEffect(animate ? 1.05 : 1.0)
-                .opacity(animate ? 0.0 : 1.0)
-                .animation(.easeInOut(duration: 0.25), value: animate)
-
+            
+            HStack(spacing: 8){
+                Spacer()
+                CircularProgressView(progress: viewModel.progress, color: .white, size: 20)
+                Text(code)
+                    .font(.system(size: 36, weight: .bold, design: .monospaced))
+                    .foregroundColor(.white)
+                    .padding(.vertical, 8)
+                    .scaleEffect(animate ? 1.05 : 1.0)
+                    .opacity(animate ? 0.0 : 1.0)
+                    .animation(.easeInOut(duration: 0.25), value: animate)
+                Spacer()
+            }.frame(maxWidth: .infinity, alignment: .center)
+        
         }
         .padding()
         .background(color.gradient
@@ -109,6 +170,7 @@ struct TOTPBoxWrapper: View {
                     website: entry.name,
                     code: "\(entry.totp_code ?? "Error")" ,
                     color: entry.color,
+                    icon_url: entry.favicon_url ,
                     onEdit: { print("edit tapped")},
                     viewModel: viewModel
                 )
@@ -140,48 +202,29 @@ struct VaultView: View {
                         .offset(x: 150, y: 250)
                         .blur(radius: 100)
 
-                VStack{
-                VStack {
-                    Image("logo_zero_totp_light")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(maxWidth: 100)
-                        .padding(.top, 20)
-                        .padding(.horizontal, 40)
-                    Text("Your TOTP vault").font(.largeTitle).bold().foregroundStyle(.white).padding(.trailing, 30).padding(.leading, 30).multilineTextAlignment(.center)
-                    Text("You and only you can access to this data. All the magic is done on your iPhone.").font(.subheadline ).bold().foregroundStyle(.gray)
-                        .padding(.trailing, 30).padding(.leading, 30).multilineTextAlignment(.center).padding(.bottom, 30)
-                    
-                    HStack{
-                        Text(Image(systemName: "magnifyingglass")).foregroundStyle(.white)
-                        TextField("Search", text:$searchText )
-                            .autocapitalization(.none)
-                            .preferredColorScheme(.dark)
-                            .foregroundColor(.white)
-                            .bold().onAppear { UITextField.appearance().clearButtonMode = .whileEditing }
-                    }.padding(.horizontal, 30).padding(.bottom, 20)
-                    
-                    ProgressView(value: viewModel.progress)
-                        .padding(.horizontal)
-                        .progressViewStyle(LinearProgressViewStyle(tint: .white))
-                }.sheet(isPresented: $viewModel.show_login_page ) {
-                    viewModel.onVaultAppear()
-                    print("login view dismissed")
-                } content: {
-                    LoginView(vaultViewModel: viewModel)
-                }
+
                     VStack{
                         
                         ScrollView(.vertical) {
-                            ForEach(viewModel.vault){  entry in
-                                if (searchText == "" || (entry.name.lowercased().contains(searchText.lowercased()) || (entry.domain?.lowercased().contains(searchText.lowercased()) ?? false))) {
-                                    TOTPBoxWrapper(entry: entry, viewModel: viewModel)
+                            LazyVStack(spacing: 12) {
+                                ForEach(viewModel.vault){  entry in
+                                    if (searchText == "" || (entry.name.lowercased().contains(searchText.lowercased()) || (entry.domain?.lowercased().contains(searchText.lowercased()) ?? false))) {
+                                        TOTPBoxWrapper(entry: entry, viewModel: viewModel)
+                                    }
                                 }
                             }
                         }
+                    }.sheet(isPresented: $viewModel.show_login_page ) {
+                        viewModel.onVaultAppear()
+                        print("login view dismissed")
+                    } content: {
+                        LoginView(vaultViewModel: viewModel)
                     }
-                }
             }.onAppear(perform: viewModel.onVaultAppear).toastView(toast: $viewModel.toast)
+                .navigationTitle("Your TOTP vault")
+                .navigationBarTitleDisplayMode(.automatic)
+            
+                    .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .automatic))
         }
         
     }
