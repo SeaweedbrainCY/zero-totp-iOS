@@ -198,84 +198,74 @@ class VaultViewModel:ObservableObject {
         }
         toast = FancyToast(type: type, title: title, message: message)
     }
+    
+    func decryptLocalVault(){
+        self.vault_state = .loading
+        let keychain = KeychainStorage()
+        let user_id = UserDefaults.standard.value(forKey: UserDefaultsKeys.user_id) as? Int
+        if(UserDefaults.standard.bool(forKey: VaultDefaultsKeys.is_vault_stored_in_keychain) && user_id != nil){
+            
+            do {
+                let zke_key_data:Data? = try keychain.retrieveZKEKeyFromKeychain(user_id: user_id!)
+                if (zke_key_data != nil){
+                    let stored_vault = try keychain.getEncryptedVaultFromKeychain(user_id:user_id!)
+                    if(stored_vault != nil){
+                        self.vault_state = .locally_encrypted
+                        let decrypted_vault_result = self.decrypt_vault(stored_vault!.encrypted_vault , zke_key_data: zke_key_data!)
+                        let storage_date = Date(timeIntervalSince1970: Double(stored_vault!.storage_timestamp) ?? 0)
+                        
+                        print("Vault was stored on \(storage_date.ISO8601Format())")
+                        if(!decrypted_vault_result.success){
+                            toast = FancyToast(type: .error, title: "Error while decrypting some of your secrets", message: "The vault content might not be complete. Error 0x4")
+                        }
+                        
+                        vault = decrypted_vault_result.decryptedVault
+                        self.vault_state = .loaded
+                        self.startTimer()
+                    } else {
+                        self.vault_state = .needToBeFetchedAgain
+                        print("No vault found in keychain. Displaying login view.")
+                        
+                        show_login_page = true
+                    }
+                } else {
+                    self.vault_state = .needToBeFetchedAgain
+                    print("No ZKE key found in keychain. Displaying login view.")
+                    show_login_page = true
+                }
+            } catch KeychainRetrievalError.authenticationFailed {
+                self.vault_state = .locally_encrypted
+            } catch KeychainRetrievalError.itemNotFound {
+                print("Item not found in keychain. Displaying login view.")
+                self.vault_state = .needToBeFetchedAgain
+                self.show_login_page = true
+            } catch KeychainRetrievalError.userCancel {
+                self.vault_state = .locally_encrypted
+            } catch {
+                print("Generic error while retrieving ZKE key or vault in keychain. Displaying login vault.")
+                self.vault_state = .needToBeFetchedAgain
+                self.show_login_page = true
+            }
+            
+            print("Vault view loaded. Vault state : \(self.vault_state)")
+        } else { // vault not stored in keychain
+            print("vault is not stored in keychain at all. Fetching the vault from the API.")
+            self.vault_state = .loading
+            self.fetch_new_vault_from_api()
+        }
+    }
 
     
     func onVaultAppear(){
-        self.startTimer()
-        print("Vault appeared. Vault state : \(self.vault_state)")
-        /* Flow :
-            If vault not init :
-                Try to fetch it from keychain
-                If fetched :
-                    Display vault
-                    Try to update current vault
-                    If API auth fail
-                        Display small error message
-                Else:
-                    Fetch the vault from API
-                    If API auth fail
-                        Prompt passphrase
-            Else:
-                nothing
-        */
-        if(self.vault_state == .needToBeFetchedAgain){
-            print("Vault needed to be refetched. Refetching ...")
-            self.vault_state = .loading
-            self.fetch_new_vault_from_api()
-        } else if(self.vault_state == .not_initialized){
-            self.vault_state = .loading
-            let keychain = KeychainStorage()
-            let user_id = UserDefaults.standard.value(forKey: UserDefaultsKeys.user_id) as? Int
-            if(UserDefaults.standard.bool(forKey: VaultDefaultsKeys.is_vault_stored_in_keychain) && user_id != nil){
-                
-                do {
-                    let zke_key_data:Data? = try keychain.retrieveZKEKeyFromKeychain(user_id: user_id!)
-                    if (zke_key_data != nil){
-                        let stored_vault = try keychain.getEncryptedVaultFromKeychain(user_id:user_id!)
-                        if(stored_vault != nil){
-                            self.vault_state = .locally_encrypted
-                            let decrypted_vault_result = self.decrypt_vault(stored_vault!.encrypted_vault , zke_key_data: zke_key_data!)
-                            let storage_date = Date(timeIntervalSince1970: Double(stored_vault!.storage_timestamp) ?? 0)
-                            
-                            print("Vault was stored on \(storage_date.ISO8601Format())")
-                            if(!decrypted_vault_result.success){
-                                toast = FancyToast(type: .error, title: "Error while decrypting some of your secrets", message: "The vault content might not be complete. Error 0x4")
-                            }
-                                    
-                            vault = decrypted_vault_result.decryptedVault
-                        } else {
-                            self.vault_state = .needToBeFetchedAgain
-                            print("No vault found in keychain. Displaying login view.")
-                            
-                            show_login_page = true
-                        }
-                    } else {
-                        self.vault_state = .needToBeFetchedAgain
-                        print("No ZKE key found in keychain. Displaying login view.")
-                        show_login_page = true
-                    }
-                } catch KeychainRetrievalError.authenticationFailed {
-                    self.vault_state = .locally_encrypted
-                } catch KeychainRetrievalError.itemNotFound {
-                    print("Item not found in keychain. Displaying login view.")
-                    self.vault_state = .needToBeFetchedAgain
-                    self.show_login_page = true
-                } catch KeychainRetrievalError.userCancel {
-                    self.vault_state = .locally_encrypted
-                } catch {
-                    print("Generic error while retrieving ZKE key or vault in keychain. Displaying login vault.")
-                    self.vault_state = .needToBeFetchedAgain
-                    self.show_login_page = true
-                }
-                
-                print("Vault view loaded. Vault state : \(self.vault_state)")
-                
-            } else { // vault not stored in keychain
-                print("vault is not stored in keychain at all. Fetching the vault from the API.")
-                self.vault_state = .loading
-                self.fetch_new_vault_from_api()
+        print("Vault view appeared. Vault state : \(self.vault_state)")
+        if(self.vault_state == .not_initialized){
+            if(UserDefaults.standard.bool(forKey: VaultDefaultsKeys.is_vault_stored_in_keychain)){
+                self.vault_state = .locally_encrypted
+            } else {
+                self.vault_state = .needToBeFetchedAgain
             }
-        }
+           
+       }
     }
     
     func fetch_new_vault_from_api(){
@@ -302,8 +292,9 @@ class VaultViewModel:ObservableObject {
                                     
                                     toast = FancyToast(type: .error, title: "Error while decrypting one of your secret", message: "The vault content might not be complete. Error 0x4")
                                 }
-                                
+                                self.vault_state = .loaded
                                 vault = decryption_result.decryptedVault
+                                self.startTimer()
                             }
                         } else {
                             await MainActor.run {

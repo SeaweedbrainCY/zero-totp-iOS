@@ -204,15 +204,87 @@ struct VaultView: View {
 
 
                     VStack{
+                        if(viewModel.vault_state == .locally_encrypted){
                         
-                        ScrollView(.vertical) {
-                            LazyVStack(spacing: 12) {
-                                ForEach(viewModel.vault){  entry in
-                                    if (searchText == "" || (entry.name.lowercased().contains(searchText.lowercased()) || (entry.domain?.lowercased().contains(searchText.lowercased()) ?? false))) {
-                                        TOTPBoxWrapper(entry: entry, viewModel: viewModel)
+                                VStack{
+                                    Spacer()
+                                    Image(systemName:"exclamationmark.lock")
+                                        .font(.largeTitle)
+                                    Text("Your vault is encrypted.").font(.title)
+                                    Button(action: {
+                                        viewModel.vault_state = .loading
+                                        
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                            // We let the UI update.
+                                            viewModel.decryptLocalVault()
+                                        }
+                                        
+                                    }) {
+                                        Label("Decrypt my vault", systemImage: "lock.app.dashed")
+                                    }.buttonStyle(.borderedProminent)
+                                        .padding(.top, 20)
+                                        .font(.subheadline)
+                                    Spacer()
+                                    Button(action: {
+                                        
+                                    }) {
+                                        Label("Logout", systemImage: "person.crop.circle.fill.badge.minus")
+                                            
+                                    }.buttonStyle(.bordered)
+                                        .foregroundStyle(.gray)
+                                        .padding(.bottom, 50)
+                                }
+                            }
+                        
+                        if(viewModel.vault_state == .needToBeFetchedAgain){
+                        
+                                VStack{
+                                    Spacer()
+                                    Image(systemName:"externaldrive.fill.badge.questionmark")
+                                        .font(.largeTitle)
+                                    Text("You need to login again to decrypt your vault").font(.title)
+                                    Button(action: {
+                                        viewModel.show_login_page = true
+                                    }) {
+                                        Label("Login", systemImage: "person.crop.circle.badge")
+                                    }.buttonStyle(.borderedProminent)
+                                        .padding(.top, 20)
+                                        .font(.subheadline)
+                                    Spacer()
+                                }
+                            }
+                        
+                            if(viewModel.vault_state != .locally_encrypted && viewModel.vault_state != .loaded && viewModel.vault_state != .needToBeFetchedAgain){
+                            VStack{
+                                Spacer()
+                                ProgressView()
+                                Text("Decrypting your vault ...").font(.subheadline).foregroundStyle(.gray)
+                                
+                                Spacer()
+                                Button(action: {
+                                    
+                                }) {
+                                    Label("Logout", systemImage: "person.crop.circle.fill.badge.minus")
+                                        
+                                }.buttonStyle(.bordered)
+                                    .foregroundStyle(.gray)
+                                    .padding(.bottom, 50)
+                            }
+                        }
+                        
+                            
+                        if(viewModel.vault_state == .loaded){
+                            ScrollView(.vertical) {
+                                LazyVStack(spacing: 12) {
+                                    ForEach(viewModel.vault){  entry in
+                                        if (searchText == "" || (entry.name.lowercased().contains(searchText.lowercased()) || (entry.domain?.lowercased().contains(searchText.lowercased()) ?? false))) {
+                                            TOTPBoxWrapper(entry: entry, viewModel: viewModel)
+                                        }
                                     }
                                 }
                             }
+                            
+                            
                         }
                     }.sheet(isPresented: $viewModel.show_login_page ) {
                         viewModel.onVaultAppear()
@@ -220,7 +292,8 @@ struct VaultView: View {
                     } content: {
                         LoginView(vaultViewModel: viewModel)
                     }
-            }.onAppear(perform: viewModel.onVaultAppear).toastView(toast: $viewModel.toast)
+            }.onAppear(perform: viewModel.onVaultAppear)
+                .toastView(toast: $viewModel.toast)
                 .navigationTitle("Your TOTP vault")
                 .navigationBarTitleDisplayMode(.automatic)
             
