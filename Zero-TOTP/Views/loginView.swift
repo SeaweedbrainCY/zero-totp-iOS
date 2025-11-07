@@ -160,7 +160,7 @@ struct LoginView: View {
                     .padding(.top, 30)
                     .padding(.horizontal, 40).padding(.bottom, 70)
                 
-                Text("Decrypt your vault").font(.largeTitle).bold().foregroundStyle(.white)
+                Text("Login to your account").font(.largeTitle).bold().foregroundStyle(.white)
                     .padding(.bottom, 70)
                 HStack{
                     Text(Image(systemName: "envelope")).foregroundStyle(.white)

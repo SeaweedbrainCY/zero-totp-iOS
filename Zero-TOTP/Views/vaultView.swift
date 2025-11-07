@@ -226,7 +226,7 @@ struct VaultView: View {
                                         .font(.subheadline)
                                     Spacer()
                                     Button(action: {
-                                        
+                                        viewModel.logout()
                                     }) {
                                         Label("Logout", systemImage: "person.crop.circle.fill.badge.minus")
                                             
@@ -262,7 +262,7 @@ struct VaultView: View {
                                 
                                 Spacer()
                                 Button(action: {
-                                    
+                                    viewModel.logout()
                                 }) {
                                     Label("Logout", systemImage: "person.crop.circle.fill.badge.minus")
                                         

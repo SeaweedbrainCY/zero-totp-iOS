@@ -18,6 +18,7 @@ enum VaultState {
     case locally_encrypted;
     case loaded;
     case needToBeFetchedAgain;
+    case needToLogin;
 }
 
 class TOTPEntry: ObservableObject, Identifiable, Codable {
@@ -199,6 +200,7 @@ class VaultViewModel:ObservableObject {
         toast = FancyToast(type: type, title: title, message: message)
     }
     
+    
     func decryptLocalVault(){
         self.vault_state = .loading
         let keychain = KeychainStorage()
@@ -226,25 +228,25 @@ class VaultViewModel:ObservableObject {
                         self.vault_state = .needToBeFetchedAgain
                         print("No vault found in keychain. Displaying login view.")
                         
-                        show_login_page = true
+                        self.fetch_new_vault_from_api()
                     }
                 } else {
                     self.vault_state = .needToBeFetchedAgain
                     print("No ZKE key found in keychain. Displaying login view.")
-                    show_login_page = true
+                    self.fetch_new_vault_from_api()
                 }
             } catch KeychainRetrievalError.authenticationFailed {
                 self.vault_state = .locally_encrypted
             } catch KeychainRetrievalError.itemNotFound {
                 print("Item not found in keychain. Displaying login view.")
                 self.vault_state = .needToBeFetchedAgain
-                self.show_login_page = true
+                self.fetch_new_vault_from_api()
             } catch KeychainRetrievalError.userCancel {
                 self.vault_state = .locally_encrypted
             } catch {
                 print("Generic error while retrieving ZKE key or vault in keychain. Displaying login vault.")
                 self.vault_state = .needToBeFetchedAgain
-                self.show_login_page = true
+                self.fetch_new_vault_from_api()
             }
             
             print("Vault view loaded. Vault state : \(self.vault_state)")
@@ -263,13 +265,16 @@ class VaultViewModel:ObservableObject {
                 self.vault_state = .locally_encrypted
             } else {
                 self.vault_state = .needToBeFetchedAgain
+                self.fetch_new_vault_from_api()
             }
            
-       }
+        } else if (self.vault_state == .needToLogin) {
+            self.vault_state = .loading
+            self.fetch_new_vault_from_api()
+        }
     }
     
     func fetch_new_vault_from_api(){
-       
         Task {
             let user_id:Int? = await self.who_am_i();
             let keychain = KeychainStorage()
@@ -310,17 +315,20 @@ class VaultViewModel:ObservableObject {
                     self.vault_state = .locally_encrypted
                 } catch KeychainRetrievalError.itemNotFound {
                     await MainActor.run {
+                        self.vault_state = .needToLogin
                         show_login_page = true
                     }
                 } catch KeychainRetrievalError.userCancel {
                     self.vault_state = .locally_encrypted
                 } catch {
                     await MainActor.run {
+                        self.vault_state = .needToLogin
                         show_login_page = true
                     }
                 }
             } else {
                 await MainActor.run {
+                    self.vault_state = .needToLogin
                     show_login_page = true
                 }
             }
@@ -329,7 +337,7 @@ class VaultViewModel:ObservableObject {
     
     
     private func decrypt_vault(_ encryptedVault:[VaultAPI.EncryptedSecret], zke_key_data:Data) -> DecryptionVaultResult{
-        var decryption_failed = false;
+        var decryption_succeess = true;
         var decrypted_vault=[TOTPEntry]()
         let crypto_tools = CryptoTools()
         for enc_secret in encryptedVault {
@@ -361,17 +369,17 @@ class VaultViewModel:ObservableObject {
                     print("Secret for \(decoded_secret.name) added")
                 } catch{
                    print("Failed to decode secret. \(error)");
-                    decryption_failed = true;
+                    decryption_succeess = false;
                     continue;
                 }
                 
             } else {
                 print("dec_secret is nil.")
-                decryption_failed = true;
+                decryption_succeess = false;
             }
             
         }
-        return DecryptionVaultResult(success: decryption_failed, decryptedVault: decrypted_vault)
+        return DecryptionVaultResult(success: decryption_succeess, decryptedVault: decrypted_vault)
     }
     
     private func startTimer() {
@@ -456,19 +464,12 @@ class VaultViewModel:ObservableObject {
         update_toast(type: .success, title: "Copied !", message: "")
     }
     
-    /*public func filterTOTPCodes(_ filter:String){
-        print("filtering on \(filter)")
-        if filter == ""{
-            for entry in vault {
-                entry.isHidden = false
-            }
-        }
-        for entry in vault {
-            if(){
-                entry.isHidden = true
-                print("\(entry.name) is now hidden")
-            }
-        }
-    }*/
+    func logout(){
+        Utils().eraseUserData()
+        update_toast(type: .success, title: "Logged out !", message: "")
+        self.show_login_page = false
+    }
+    
+   
 }
 
